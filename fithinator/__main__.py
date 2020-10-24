@@ -19,10 +19,13 @@ def __main__():
     for target in c.servers.keys():
         server = Server(c.get_server(target))
         info = server.get_info()
+        players = server.get_players()
 
         print(info.server_name)
         print(info.map_name)
         print("%s/%s online" % (info.player_count, info.max_players))
+        for player in players:
+            print("  " + player.name)
         print()
 
 if __name__ == "__main__":
