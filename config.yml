@@ -1,0 +1,11 @@
+---
+servers:
+  'Main Server':
+    host: '216.52.148.223'
+    port: 27015
+  '24/7 Payload':
+    host: '216.52.148.223'
+    port: 27069
+  'Heavy Boxing':
+    host: '216.52.148.223'
+    port: 27060
