@@ -9,3 +9,5 @@ servers:
   'Heavy Boxing':
     host: '216.52.148.223'
     port: 27060
+
+display: 'asciiblock'

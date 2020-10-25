@@ -13,6 +13,6 @@ setup(
     description='The FITHINATOR: A status monitor for FITH TF2 servers',
     packages=find_packages(),
     python_requires='>=3.6',
-    install_requires=['a2s', 'yaml'],
+    install_requires=['a2s', 'yaml', 'luma.core', 'luma.emulator'],
     package_dir={'fithinator': 'fithinator/'}
 )
