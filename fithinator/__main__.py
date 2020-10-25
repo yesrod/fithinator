@@ -25,7 +25,11 @@ def __main__():
             output = str()
             for target in c.servers.keys():
                 server = Server(c.get_server(target))
-                info = server.get_info()
+                try:
+                    info = server.get_info()
+                except socket.timeout:
+                    output += "Failed to query %s\n\n\n\n" % target
+                    continue
                 #players = server.get_players()
 
                 output += info.server_name + "\n"
