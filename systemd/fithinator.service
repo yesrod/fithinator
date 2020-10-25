@@ -3,6 +3,7 @@ Description=The FITHINATOR
 
 [Service]
 ExecStart=/usr/bin/python3 -m fithinator -c /boot/fithinator.yml
+KillSignal=SIGINT
 
 [Install]
 WantedBy=multi-user.target

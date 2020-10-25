@@ -35,7 +35,8 @@ def __main__():
                 #    print("  " + player.name)
                 #print()
             d.write(output)
-            time.sleep(30)
+            for i in range(60):
+                time.sleep(1)
     except (KeyboardInterrupt, SystemExit):
         sys.exit()
 

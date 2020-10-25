@@ -11,14 +11,14 @@ class Display():
         self.display = display
 
         resource_package = __name__
-        resource_path = '/'
+        resource_path = ''
         static_path = pkg_resources.resource_filename(resource_package, resource_path)
 
-        self.font = ImageFont.truetype('%sfont/OpenSans-Regular.ttf', 16)
+        self.font = ImageFont.truetype('%s/font/OpenSans-Regular.ttf' % static_path, 16)
 
         try:
             parser = cmdline.create_parser(description='FITHINATOR display args')
-            conf = cmdline.load_config('%sconf/%s.conf' % (static_path, display))
+            conf = cmdline.load_config('%s/conf/%s.conf' % (static_path, display))
             args = parser.parse_args(conf)
         except FileNotFoundError:
             conf = ['--display=%s' % display]
