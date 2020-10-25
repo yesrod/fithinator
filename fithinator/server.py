@@ -1,4 +1,5 @@
 import a2s
+import socket
 
 class Server():
 
@@ -14,7 +15,10 @@ class Server():
         address = addr
 
     def get_info(self):
-        return a2s.info(address)
+        try:
+            return a2s.info(address)
+        except socket.timeout:
+            return None
 
     def get_players(self):
         return a2s.players(address)

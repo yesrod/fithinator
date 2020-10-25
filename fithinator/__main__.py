@@ -25,9 +25,8 @@ def __main__():
             output = str()
             for target in c.servers.keys():
                 server = Server(c.get_server(target))
-                try:
-                    info = server.get_info()
-                except socket.timeout:
+                info = server.get_info()
+                if info == None:
                     output += "Failed to query %s\n\n\n\n" % target
                     continue
                 #players = server.get_players()
@@ -39,8 +38,7 @@ def __main__():
                 #    print("  " + player.name)
                 #print()
             d.write(output)
-            for i in range(60):
-                time.sleep(1)
+            time.sleep(60)
     except (KeyboardInterrupt, SystemExit):
         sys.exit()
 
