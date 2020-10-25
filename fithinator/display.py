@@ -1,5 +1,7 @@
 from luma.core import cmdline, error
 from luma.core.render import canvas
+from PIL import ImageFont
+
 import luma.emulator.device
 import pkg_resources
 
@@ -9,17 +11,18 @@ class Display():
         self.display = display
 
         resource_package = __name__
-        resource_path = '/conf'
+        resource_path = '/'
         static_path = pkg_resources.resource_filename(resource_package, resource_path)
+
+        self.font = ImageFont.truetype('%sfont/OpenSans-Regular.ttf', 16)
 
         try:
             parser = cmdline.create_parser(description='FITHINATOR display args')
-            conf = cmdline.load_config('%s/%s.conf' % (static_path, display))
+            conf = cmdline.load_config('%sconf/%s.conf' % (static_path, display))
             args = parser.parse_args(conf)
         except FileNotFoundError:
             conf = ['--display=%s' % display]
             args = parser.parse_args(conf)
-
 
         try:
             self.device = cmdline.create_device(args)
@@ -29,4 +32,4 @@ class Display():
 
     def write(self, output):
         with canvas(self.device) as self.draw:
-            self.draw.text((0, 0), output)
+            self.draw.text((0, 0), output, font=self.font)
