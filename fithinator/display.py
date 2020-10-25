@@ -10,7 +10,6 @@ class Display():
         try:
             parser = cmdline.create_parser(description='FITHINATOR display args')
             conf = cmdline.load_config('conf/%s.conf' % display)
-            print(conf)
             args = parser.parse_args(conf)
         except FileNotFoundError:
             conf = ['--display=%s' % display]
