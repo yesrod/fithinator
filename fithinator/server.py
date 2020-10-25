@@ -21,7 +21,13 @@ class Server():
             return None
 
     def get_players(self):
-        return a2s.players(address)
+        try:
+            return a2s.players(address)
+        except socket.timeout:
+            return None
 
     def get_rules(self):
-        return a2s.rules(address)
+        try:
+            return a2s.rules(address)
+        except socket.timeout:
+            return None
