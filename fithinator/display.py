@@ -40,8 +40,8 @@ class Display():
                 self.quarter(q, eval(q))
 
     def quarter(self, quarter, output):
-        half_x = self.device.width / 2
-        half_y = self.device.height / 2
+        half_x = int(self.device.width / 2)
+        half_y = int(self.device.height / 2)
         quarters = {'ul': (0, 0), 
                     'ur': (half_x, 0), 
                     'll': (0, half_y),
