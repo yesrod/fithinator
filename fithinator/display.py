@@ -66,7 +66,7 @@ class Display():
             self.text_align_center(quarters[quarter], output)
         elif callable(getattr(output, 'tobitmap', None)):
             self.draw.bitmap(quarters[quarter], 
-                    output.resize(quarters[quarter]).convert('1')
+                    output.resize((half_x, half_y)).convert('1')
             )
 
     def load_image(self, image_path):
