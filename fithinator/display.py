@@ -7,14 +7,16 @@ import pkg_resources
 
 class Display():
 
-    def __init__(self, display):
+    def __init__(self, display, font_size=16):
         self.display = display
 
         resource_package = __name__
         resource_path = ''
         static_path = pkg_resources.resource_filename(resource_package, resource_path)
 
-        self.font = ImageFont.truetype('%s/font/OpenSans-Regular.ttf' % static_path, 16)
+        self.font_size = font_size
+        self.font_size_px = int(font_size * 1.33333333)
+        self.font = ImageFont.truetype('%s/font/OpenSans-Regular.ttf' % static_path, self.font_size)
 
         try:
             parser = cmdline.create_parser(description='FITHINATOR display args')
@@ -34,11 +36,11 @@ class Display():
         half_x = int(self.device.width / 2)
         lines = message.split('\n')
         for i, line in enumerate(lines):
-            w, h = self.draw.textbbox((0,0), line, font=self.font)
+            w = self.draw.textsize(line, font=self.font)[0]
             self.draw.text((xy[0] + ((half_x - w) / 2), 
-                            xy[1] + (h * i)), 
+                            xy[1] + (self.font_size_px + i)),
                             line, 
-                            fill=fill, 
+                            fill = fill,
                             font=self.font)
 
     def write(self, output):
