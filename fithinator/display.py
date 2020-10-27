@@ -38,7 +38,7 @@ class Display():
         for i, line in enumerate(lines):
             w = self.draw.textsize(line, font=self.font)[0]
             self.draw.text((xy[0] + ((half_x - w) / 2), 
-                            xy[1] + (self.font_size_px + i)),
+                            xy[1] + (self.font_size_px * i)),
                             line, 
                             fill = fill,
                             font=self.font)
