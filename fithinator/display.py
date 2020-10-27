@@ -34,7 +34,7 @@ class Display():
         half_x = int(self.device.width / 2)
         lines = message.split('\n')
         for i, line in enumerate(lines):
-            w, h = self.draw.textsize(line, font=self.font)
+            w, h = self.draw.textbbox((0,0), line, font=self.font)
             self.draw.text((xy[0] + ((half_x - w) / 2), 
                             xy[1] + (h * i)), 
                             line, 
