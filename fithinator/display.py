@@ -30,6 +30,10 @@ class Display():
             parser.error(e)
             self.device = None
 
+    def text_align_center(self, xy, message, fill="white"):
+        w = self.draw.textsize(message)[0]
+        self.draw.text((xy[0]-(w/2), xy)[1], message, fill=fill, font=self.font)
+
     def write(self, output):
         with canvas(self.device) as self.draw:
             self.draw.text((0, 0), output, font=self.font)
@@ -50,7 +54,7 @@ class Display():
             raise ValueError("quarter must be one of %s" % ", ".join(quarters))
 
         if type(output) == str:
-            self.draw.text(quarters[quarter], output, font=self.font)
+            self.text_align_center(quarters[quarter], output)
         elif callable(getattr(output, 'tobitmap', None)):
             self.draw.bitmap(quarters[quarter], 
                     output.resize(quarters[quarter]).convert('1')

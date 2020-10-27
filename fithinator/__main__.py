@@ -31,11 +31,11 @@ def __main__():
         while True:
             q = []
             for target in c.servers.keys():
-                output = str()
+                output = "\n"
                 server = Server(c.get_server(target))
                 info = server.get_info()
                 if info == None:
-                    output += "Failed to query %s\n\n\n\n" % target
+                    output += "\n%s\nUPDATE FAILED\n\n" % target
                     continue
 
                 output += target + "\n"
