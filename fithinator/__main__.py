@@ -5,6 +5,7 @@ from .display import Display
 import argparse
 import time
 import sys
+import pkg_resources
 
 def parse_args():
     global parsed_args
@@ -20,24 +21,33 @@ def __main__():
     c = Config(parsed_args.config)
     d = Display(c.get_display())
 
+    resource_package = __name__
+    resource_path = ''
+    static_path = pkg_resources.resource_filename(resource_package, resource_path)
+
+    fith_logo = d.load_image('%s/font/FITH_Logo.jpg' % static_path)
+
     try:
         while True:
-            output = str()
+            q = []
             for target in c.servers.keys():
+                output = str()
                 server = Server(c.get_server(target))
                 info = server.get_info()
                 if info == None:
                     output += "Failed to query %s\n\n\n\n" % target
                     continue
-                #players = server.get_players()
 
-                output += info.server_name + "\n"
+                output += target + "\n"
                 output += info.map_name + "\n"
                 output += "%s/%s online" % (info.player_count, info.max_players) + "\n\n"
-                #for player in players:
-                #    print("  " + player.name)
-                #print()
-            d.write(output)
+                q.append(output)
+            while len(q) < 4:
+                q.append(fith_logo)
+            d.write_quarters( ul = q[0],
+                              ur = q[1],
+                              ll = q[2],
+                              lr = q[3] )
             time.sleep(60)
     except (KeyboardInterrupt, SystemExit):
         sys.exit()

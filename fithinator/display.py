@@ -1,6 +1,6 @@
 from luma.core import cmdline, error
 from luma.core.render import canvas
-from PIL import ImageFont
+from PIL import ImageFont, Image
 
 import luma.emulator.device
 import pkg_resources
@@ -33,3 +33,27 @@ class Display():
     def write(self, output):
         with canvas(self.device) as self.draw:
             self.draw.text((0, 0), output, font=self.font)
+
+    def write_quarters(self, ul=None, ur=None, ll=None, lr=None):
+        with canvas(self.device) as self.draw:
+            for q in ('ul', 'ur', 'll', 'lr'):
+                self.quarter(q, eval(q))
+
+    def quarter(self, quarter, output):
+        half_x = self.device.width
+        half_y = self.device.height
+        quarters = {'ul': (0, 0), 
+                    'ur': (half_x, 0), 
+                    'll': (0, half_y),
+                    'lr': (half_x, half_y)}
+        if quarter not in quarters.keys():
+            raise ValueError("quarter must be one of %s" % ", ".join(quarters))
+
+        if type(output) == str:
+            self.draw.text(quarters[quarter], output, font=self.font)
+        elif type(output) == Image:
+            output.resize(quarters[quarter])
+            self.draw.bitmap(quarters[quarter], output.tobitmap())
+
+    def load_image(self, image_path):
+        return Image.open(image_path)
