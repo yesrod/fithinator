@@ -31,8 +31,10 @@ class Display():
             self.device = None
 
     def text_align_center(self, xy, message, fill="white"):
-        w = self.draw.textsize(message)[0]
-        self.draw.text((xy[0]-(w/2), xy)[1], message, fill=fill, font=self.font)
+        lines = message.split('\n')
+        for i, line in enumerate(lines):
+            w, h = self.draw.textsize(line)
+            self.draw.text((xy[0]-(w/2), xy[1] + (h * i)), line, fill=fill, font=self.font)
 
     def write(self, output):
         with canvas(self.device) as self.draw:
