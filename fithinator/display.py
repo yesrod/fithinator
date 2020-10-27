@@ -52,8 +52,9 @@ class Display():
         if type(output) == str:
             self.draw.text(quarters[quarter], output, font=self.font)
         elif callable(getattr(output, 'tobitmap', None)):
-            resized = output.resize(quarters[quarter]).convert('1')
-            self.draw.bitmap(quarters[quarter], resized.tobitmap())
+            self.draw.bitmap(quarters[quarter], 
+                    output.resize(quarters[quarter]).convert('1')
+            )
 
     def load_image(self, image_path):
         return Image.open(image_path)
