@@ -37,16 +37,15 @@ def __main__():
                 info = server.get_info()
                 if info == None:
                     output += "%s\nUPDATE FAILED\n\n" % target
-                    continue
-
-                if info.password_protected:
-                    locked = lock + " "
                 else:
-                    locked = ""
+                    if info.password_protected:
+                        locked = lock + " "
+                    else:
+                        locked = ""
 
-                output += target + "\n"
-                output += info.map_name + "\n"
-                output += locked + "%s/%s online" % (info.player_count, info.max_players) + "\n\n"
+                    output += target + "\n"
+                    output += info.map_name + "\n"
+                    output += locked + "%s/%s online" % (info.player_count, info.max_players) + "\n\n"
                 q.append(output)
             while len(q) < 4:
                 q.append(fith_logo)
