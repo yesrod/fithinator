@@ -26,6 +26,7 @@ def __main__():
     static_path = pkg_resources.resource_filename(resource_package, resource_path)
 
     fith_logo = d.load_image('%s/font/FITH_Logo.jpg' % static_path)
+    lock = "\ua5c3"
 
     try:
         while True:
@@ -38,9 +39,14 @@ def __main__():
                     output += "\n%s\nUPDATE FAILED\n\n" % target
                     continue
 
+                if info.password_protected:
+                    locked = lock + " "
+                else:
+                    locked = ""
+
                 output += target + "\n"
                 output += info.map_name + "\n"
-                output += "%s/%s online" % (info.player_count, info.max_players) + "\n\n"
+                output += locked + "%s/%s online" % (info.player_count, info.max_players) + "\n\n"
                 q.append(output)
             while len(q) < 4:
                 q.append(fith_logo)

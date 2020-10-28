@@ -16,7 +16,7 @@ class Display():
 
         self.font_size = font_size
         self.font_size_px = int(font_size * 1.33333333)
-        self.font = ImageFont.truetype('%s/font/OpenSans-Regular.ttf' % static_path, self.font_size)
+        self.font = ImageFont.truetype('%s/font/FreeSans.ttf' % static_path, self.font_size)
 
         try:
             parser = cmdline.create_parser(description='FITHINATOR display args')
