@@ -36,7 +36,7 @@ def __main__():
                 server = Server(c.get_server(target))
                 info = server.get_info()
                 if info == None:
-                    output += "\n%s\nUPDATE FAILED\n\n" % target
+                    output += "%s\nUPDATE FAILED\n\n" % target
                     continue
 
                 if info.password_protected:
