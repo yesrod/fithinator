@@ -17,7 +17,7 @@ class Server():
     def get_info(self):
         try:
             return a2s.info(address)
-        except socket.timeout:
+        except (socket.timeout, OSError):
             return None
 
     def get_players(self):
