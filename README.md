@@ -24,3 +24,7 @@ sudo python3 -m fithinator -c config.yml
 ```
 
 Systemd script is provided under `systemd` for convenience.
+
+CASE
+====
+A case is available at https://www.thingiverse.com/thing:4660995 that holds a Pi Zero W and an ILI9341 2.2" LCD module.
