@@ -6,6 +6,7 @@ import argparse
 import time
 import sys
 import pkg_resources
+import textwrap
 
 from itertools import zip_longest
 
@@ -71,8 +72,12 @@ def display_detail(c, d):
             else:
                 locked = ""
 
-            body = split_string(info.server_name, d, d.device.width) + "\n"
-            body += info.map_name + "\n"
+            body = textwrap.wrap(
+                        info.server_name, 
+                        width=d.max_char) + "\n"
+            body += textwrap.wrap(
+                        info.map_name,
+                        width = d.max_char) + "\n"
             body += locked + "%s/%s online" % (info.player_count, info.max_players) + "\n\n"
 
         d.write_header_body(target, body)
@@ -81,25 +86,6 @@ def display_detail(c, d):
 def grouper(iterable, n, fillvalue=None):
     args = [iter(iterable)] * n
     return zip_longest(*args, fillvalue=fillvalue)
-
-def split_string(s, d, max):
-    strings = [s]
-    too_long = True
-    while too_long:
-        too_long = False
-        new_strings = []
-        for string in strings:
-            if d.textsize(string) > max:
-                new_strings += split_center(s)
-                too_long = True
-            else:
-                new_strings.append(s)
-    return "\n".join(new_strings)
-
-def split_center(s):
-    mid = min((i for i, c in enumerate(s) if c == ' '), key=lambda i: abs(i - len(s) // 2))
-    front, back = s[:mid], s[mid+1:]
-    return [front, back]
 
 if __name__ == "__main__":
     parse_args()
