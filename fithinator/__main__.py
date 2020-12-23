@@ -7,6 +7,7 @@ import time
 import sys
 import pkg_resources
 
+from itertools import zip_longest
 
 def parse_args():
     global parsed_args
@@ -18,7 +19,6 @@ def parse_args():
     )
     parsed_args = p.parse_args()
 
-
 def __main__():
     c = Config(parsed_args.config)
     d = Display(c.get_display())
@@ -26,13 +26,12 @@ def __main__():
     try:
         while True:
             display_summary(c, d)
-            time.sleep(60)
     except (KeyboardInterrupt, SystemExit):
         sys.exit()
 
-
 def display_summary(c, d):
     q = []
+    q_chunk = []
     for target in c.servers.keys():
         output = "\n"
         server = Server(c.get_server(target))
@@ -49,13 +48,17 @@ def display_summary(c, d):
             output += info.map_name + "\n"
             output += locked + "%s/%s online" % (info.player_count, info.max_players) + "\n\n"
         q.append(output)
-    while len(q) < 4:
-        q.append(d.fith_logo)
-    d.write_quarters( ul = q[0],
-                      ur = q[1],
-                      ll = q[2],
-                      lr = q[3] )
+    q_chunk = grouper(q, 3, fillvalue = " ")
+    for chunk in q_chunk:
+        d.write_quarters( ul = chunk[0],
+                          ur = chunk[1],
+                          ll = chunk[2],
+                          lr = d.fith_logo )
+        time.sleep(15)
 
+def grouper(iterable, n, fillvalue=None):
+    args = [iter(iterable)] * n
+    return zip_longest(*args, fillvalue=fillvalue)
 
 if __name__ == "__main__":
     parse_args()
