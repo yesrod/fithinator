@@ -26,8 +26,13 @@ def __main__():
 
     try:
         while True:
-            display_summary(c, d)
-            display_detail(c, d)
+            if not c.summary and not c.details:
+                display_summary(c, d)
+            else:
+                if c.summary:
+                    display_summary(c, d)
+                if c.details:
+                    display_detail(c, d)
     except (KeyboardInterrupt, SystemExit):
         sys.exit()
 

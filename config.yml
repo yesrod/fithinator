@@ -11,3 +11,5 @@ servers:
     port: 27060
 
 display: 'ili9341'
+summary: true
+details: false

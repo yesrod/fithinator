@@ -23,6 +23,20 @@ class Config():
             print('Defaulting to ILI9341')
             self.display = 'ili9341'
 
+        try:
+            self.summary = config['summary']
+            if type(self.summary) != bool:
+                self.summary = False
+        except KeyError:
+            self.summary = False
+
+        try:
+            self.details = config['details']
+            if type(self.details) != bool:
+                self.details = False
+        except KeyError:
+            self.details = False
+
     def get_server(self, server):
         return (self.servers[server]['host'],
                 self.servers[server]['port']
