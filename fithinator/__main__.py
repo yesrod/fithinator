@@ -26,6 +26,7 @@ def __main__():
     try:
         while True:
             display_summary(c, d)
+            display_detail(c, d)
     except (KeyboardInterrupt, SystemExit):
         sys.exit()
 
@@ -56,6 +57,26 @@ def display_summary(c, d):
                           ur = q[1],
                           ll = q[2],
                           lr = d.fith_logo )
+        time.sleep(15)
+
+def display_detail(c, d):
+    for target in c.servers.keys():
+        server = Server(c.get_server(target))
+        info = server.get_info()
+        if info == None:
+            body = "%s\nUPDATE FAILED\n\n" % target
+        else:
+            if info.password_protected:
+                locked = d.lock + " "
+            else:
+                locked = ""
+
+            body = info.server_name + "\n"
+            body = info.map_name + "\n"
+            body = locked + "%s/%s online" % (info.player_count, info.max_players) + "\n\n"
+
+        d.write_header(target)
+        d.write_body(body)
         time.sleep(15)
 
 def grouper(iterable, n, fillvalue=None):
