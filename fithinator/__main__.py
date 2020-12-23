@@ -30,9 +30,9 @@ def __main__():
         sys.exit()
 
 def display_summary(c, d):
-    q = []
     key_chunk = grouper(c.servers.keys(), 3)
     for chunk in key_chunk:
+        q = []
         for target in chunk:
             if target == None:
                 output = " "
