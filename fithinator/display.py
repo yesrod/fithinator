@@ -35,12 +35,12 @@ class Display():
             parser.error(e)
             self.device = None
 
-    def text_align_center(self, xy, message, fill="white"):
-        half_x = int(self.device.width / 2)
+    def text_align_center(self, xy, bounds, message, fill="white"):
+        bound_w = bounds[0]
         lines = message.split('\n')
         for i, line in enumerate(lines):
             w = self.draw.textsize(line, font=self.font)[0]
-            self.draw.text((xy[0] + ((half_x - w) / 2), 
+            self.draw.text((xy[0] + ((bound_w - w) / 2), 
                             xy[1] + (self.font_size_px * i)),
                             line, 
                             fill = fill,
@@ -58,6 +58,7 @@ class Display():
     def quarter(self, quarter, output):
         half_x = int(self.device.width / 2)
         half_y = int(self.device.height / 2)
+        bounds = (half_x, half_y)
         quarters = {'ul': (0, 0), 
                     'ur': (half_x, 0), 
                     'll': (0, half_y),
@@ -66,7 +67,7 @@ class Display():
             raise ValueError("quarter must be one of %s" % ", ".join(quarters))
 
         if type(output) == str:
-            self.text_align_center(quarters[quarter], output)
+            self.text_align_center(quarters[quarter], bounds, output)
         elif callable(getattr(output, 'tobitmap', None)):
             self.draw.bitmap(quarters[quarter], 
                     output.resize((half_x, half_y)).convert('1')
@@ -78,10 +79,16 @@ class Display():
             self.body(body)
 
     def header(self, output):
-        self.text_align_center((0,0), output)
+        self.text_align_center(
+            (0,0),
+            (self.device.width, self.device.height), 
+            output)
 
     def body(self, output):
-        self.text_align_center((0,self.font_size_px), output)
+        self.text_align_center(
+            (0,self.font_size_px), 
+            (self.device.width, self.device.height),
+            output)
 
     def load_image(self, image_path):
         return Image.open(image_path)
