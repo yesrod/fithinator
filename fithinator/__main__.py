@@ -72,12 +72,8 @@ def display_detail(c, d):
             else:
                 locked = ""
 
-            body = textwrap.wrap(
-                        info.server_name, 
-                        width=d.max_char) + "\n"
-            body += textwrap.wrap(
-                        info.map_name,
-                        width = d.max_char) + "\n"
+            body = wrapped(info.server_name, d.max_char) + "\n"
+            body += wrapped(info.map_name, d.max_char) + "\n"
             body += locked + "%s/%s online" % (info.player_count, info.max_players) + "\n\n"
 
         d.write_header_body(target, body)
@@ -86,6 +82,9 @@ def display_detail(c, d):
 def grouper(iterable, n, fillvalue=None):
     args = [iter(iterable)] * n
     return zip_longest(*args, fillvalue=fillvalue)
+
+def wrapped(s, max):
+    return "\n".join(textwrap.wrap(s, width=max))
 
 if __name__ == "__main__":
     parse_args()
