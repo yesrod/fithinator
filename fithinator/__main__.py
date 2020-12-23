@@ -31,28 +31,29 @@ def __main__():
 
 def display_summary(c, d):
     q = []
-    q_chunk = []
-    for target in c.servers.keys():
-        output = "\n"
-        server = Server(c.get_server(target))
-        info = server.get_info()
-        if info == None:
-            output += "%s\nUPDATE FAILED\n\n" % target
-        else:
-            if info.password_protected:
-                locked = d.lock + " "
+    key_chunk = grouper(c.servers.keys(), 3)
+    for chunk in key_chunk:
+        for target in chunk:
+            output = "\n"
+            server = Server(c.get_server(target))
+            info = server.get_info()
+            if info == None:
+                output += "%s\nUPDATE FAILED\n\n" % target
             else:
-                locked = ""
+                if info.password_protected:
+                    locked = d.lock + " "
+                else:
+                    locked = ""
 
-            output += target + "\n"
-            output += info.map_name + "\n"
-            output += locked + "%s/%s online" % (info.player_count, info.max_players) + "\n\n"
-        q.append(output)
-    q_chunk = grouper(q, 3, fillvalue = " ")
-    for chunk in q_chunk:
-        d.write_quarters( ul = chunk[0],
-                          ur = chunk[1],
-                          ll = chunk[2],
+                output += target + "\n"
+                output += info.map_name + "\n"
+                output += locked + "%s/%s online" % (info.player_count, info.max_players) + "\n\n"
+            q.append(output)
+            while len(q) < 3:
+                q.append(" ")
+        d.write_quarters( ul = q[0],
+                          ur = q[1],
+                          ll = q[2],
                           lr = d.fith_logo )
         time.sleep(15)
 
