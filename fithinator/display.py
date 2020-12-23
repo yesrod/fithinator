@@ -35,7 +35,7 @@ class Display():
             parser.error(e)
             self.device = None
 
-        self.max_char = int(self.device.width // self.textsize("A"))
+        self.max_char = int(self.device.width // self.textsize("A")[0])
 
     def text_align_center(self, xy, bounds, message, fill="white"):
         bound_w = bounds[0]
