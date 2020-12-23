@@ -72,10 +72,15 @@ class Display():
                     output.resize((half_x, half_y)).convert('1')
             )
 
-    def write_header(self, output):
+    def write_header_body(self, header, body):
+        with canvas(self.device) as self.draw:
+            self.header(header)
+            self.body(body)
+
+    def header(self, output):
         self.text_align_center((0,0), output)
 
-    def write_body(self, output):
+    def body(self, output):
         self.text_align_center((0,self.font_size_px), output)
 
     def load_image(self, image_path):

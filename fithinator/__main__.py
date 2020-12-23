@@ -72,11 +72,10 @@ def display_detail(c, d):
                 locked = ""
 
             body = info.server_name + "\n"
-            body = info.map_name + "\n"
-            body = locked + "%s/%s online" % (info.player_count, info.max_players) + "\n\n"
+            body += info.map_name + "\n"
+            body += locked + "%s/%s online" % (info.player_count, info.max_players) + "\n\n"
 
-        d.write_header(target)
-        d.write_body(body)
+        d.write_header_body(target, body)
         time.sleep(15)
 
 def grouper(iterable, n, fillvalue=None):
