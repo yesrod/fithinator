@@ -72,9 +72,9 @@ def display_detail(c, d):
             else:
                 locked = ""
 
-            body = wrapped(info.server_name, d.max_char) + "\n"
-            body += wrapped(info.map_name, d.max_char) + "\n"
-            body += locked + "%s/%s online" % (info.player_count, info.max_players) + "\n\n"
+            body = "\n" + wrapped(info.server_name, d.max_char) + "\n"
+            body += "\n" + wrapped(info.map_name, d.max_char) + "\n"
+            body += "\n" + locked + "%s/%s online" % (info.player_count, info.max_players) + "\n\n"
 
         d.write_header_body(target, body)
         time.sleep(15)
