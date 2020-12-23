@@ -56,7 +56,7 @@ def display_summary(c, d):
                         locked = ""
 
                     output += target + "\n"
-                    output += wrapped(info.map_name, d.max_char / 2) + "\n"
+                    output += wrapped(info.map_name, int(d.max_char // 2)) + "\n"
                     output += locked + "%s/%s online" % (info.player_count, info.max_players) + "\n\n"
             q.append(output)
         d.write_quarters( ul = q[0],
