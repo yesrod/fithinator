@@ -88,9 +88,9 @@ def split_string(s, d, max):
     while too_long:
         too_long = False
         new_strings = []
-        for s in strings:
-            if d.textsize(s) > max:
-                new_strings.append(split_center(s))
+        for string in strings:
+            if d.textsize(string) > max:
+                new_strings += split_center(s)
                 too_long = True
             else:
                 new_strings.append(s)
@@ -99,7 +99,7 @@ def split_string(s, d, max):
 def split_center(s):
     mid = min((i for i, c in enumerate(s) if c == ' '), key=lambda i: abs(i - len(s) // 2))
     front, back = s[:mid], s[mid+1:]
-    return (front, back)
+    return [front, back]
 
 if __name__ == "__main__":
     parse_args()
