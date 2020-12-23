@@ -72,5 +72,11 @@ class Display():
                     output.resize((half_x, half_y)).convert('1')
             )
 
+    def write_header(self, output):
+        self.text_align_center((0,0), output)
+
+    def write_body(self, output):
+        self.text_align_center((0,self.font_size_px), output)
+
     def load_image(self, image_path):
         return Image.open(image_path)
