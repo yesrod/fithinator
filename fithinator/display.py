@@ -92,3 +92,6 @@ class Display():
 
     def load_image(self, image_path):
         return Image.open(image_path)
+
+    def textsize(self, s):
+        return self.font.getsize(s)
