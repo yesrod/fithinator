@@ -34,23 +34,24 @@ def display_summary(c, d):
     key_chunk = grouper(c.servers.keys(), 3)
     for chunk in key_chunk:
         for target in chunk:
-            output = "\n"
-            server = Server(c.get_server(target))
-            info = server.get_info()
-            if info == None:
-                output += "%s\nUPDATE FAILED\n\n" % target
+            if target == None:
+                output = " "
             else:
-                if info.password_protected:
-                    locked = d.lock + " "
+                output = "\n"
+                server = Server(c.get_server(target))
+                info = server.get_info()
+                if info == None:
+                    output += "%s\nUPDATE FAILED\n\n" % target
                 else:
-                    locked = ""
+                    if info.password_protected:
+                        locked = d.lock + " "
+                    else:
+                        locked = ""
 
-                output += target + "\n"
-                output += info.map_name + "\n"
-                output += locked + "%s/%s online" % (info.player_count, info.max_players) + "\n\n"
+                    output += target + "\n"
+                    output += info.map_name + "\n"
+                    output += locked + "%s/%s online" % (info.player_count, info.max_players) + "\n\n"
             q.append(output)
-            while len(q) < 3:
-                q.append(" ")
         d.write_quarters( ul = q[0],
                           ur = q[1],
                           ll = q[2],
