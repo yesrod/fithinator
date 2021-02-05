@@ -10,6 +10,20 @@ import textwrap
 
 from itertools import zip_longest
 
+map_types = {
+    "ctf": "Capture the Flag",
+    "cp": "Control Point",
+    "tc": "Territorial Control",
+    "pl": "Payload",
+    "arena": "Arena",
+    "plr": "Payload Race",
+    "koth": "King of the Hill",
+    "sd": "Special Delivery",
+    "mvm": "Mann vs. Machine",
+    "rd": "Robot Destruction",
+    "pd": "Player Destruction"
+}
+
 def parse_args():
     global parsed_args
     p = argparse.ArgumentParser(description="FITHINATOR: Status monitor for FITH servers")
@@ -55,8 +69,16 @@ def display_summary(c, d):
                     else:
                         locked = ""
 
+                    map_array = info.map_name.split('_')
+                    try:
+                        map_type = map_types[map_array.pop()]
+                    except KeyError:
+                        map_type = map_array.pop()
+                    map_name = " ".join(map_array)
+
                     output += target + "\n"
-                    output += wrapped(info.map_name, int(d.max_char // 2)) + "\n"
+                    output += map_type + "\n"
+                    output += wrapped(map_name, int(d.max_char // 2)) + "\n"
                     output += locked + "%s/%s online" % (info.player_count, info.max_players) + "\n\n"
             q.append(output)
         d.write_quarters( ul = q[0],
