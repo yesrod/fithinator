@@ -72,8 +72,12 @@ def display_summary(c, d):
                     map_array = info.map_name.split('_')
                     try:
                         map_type = map_types[map_array.pop(0)]
-                    except KeyError:
-                        map_type = map_array.pop(0)
+                    except (KeyError, IndexError):
+                        try:
+                            map_type = map_array.pop(0)
+                        except IndexError:
+                            map_type = "None"
+
                     map_name = " ".join(map_array).title()
 
                     output += target + "\n"
