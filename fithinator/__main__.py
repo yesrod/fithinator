@@ -58,7 +58,7 @@ def display_summary(c, d):
             if target == None:
                 output = " "
             else:
-                output = "\n"
+                output = ""
                 server = Server(c.get_server(target))
                 info = server.get_info()
                 if info == None:
