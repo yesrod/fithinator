@@ -17,17 +17,17 @@ class Server():
     def get_info(self):
         try:
             return a2s.info(address)
-        except (socket.timeout, OSError):
+        except (socket.timeout, OSError, a2s.exceptions.BrokenMessageError):
             return None
 
     def get_players(self):
         try:
             return a2s.players(address)
-        except socket.timeout:
+        except (socket.timeout, OSError, a2s.exceptions.BrokenMessageError):
             return None
 
     def get_rules(self):
         try:
             return a2s.rules(address)
-        except socket.timeout:
+        except (socket.timeout, OSError, a2s.exceptions.BrokenMessageError):
             return None
