@@ -21,7 +21,8 @@ map_types = {
     "sd": "Special Delivery",
     "mvm": "Mann vs. Machine",
     "rd": "Robot Destruction",
-    "pd": "Player Destruction"
+    "pd": "Player Destruction",
+    "rats": "Rats"
 }
 
 def parse_args():
@@ -70,13 +71,11 @@ def display_summary(c, d):
                         locked = ""
 
                     map_array = info.map_name.split('_')
+                    map_type_raw = map_array.pop(0)
                     try:
-                        map_type = map_types[map_array.pop(0)]
+                        map_type = map_types[map_type_raw]
                     except (KeyError, IndexError):
-                        try:
-                            map_type = map_array.pop(0)
-                        except IndexError:
-                            map_type = "None"
+                        map_type = map_type_raw
 
                     map_name = " ".join(map_array).title()
 
