@@ -3,27 +3,8 @@ from .config import Config
 from .display import Display
 
 import argparse
-import time
 import sys
 import pkg_resources
-import textwrap
-
-from itertools import zip_longest
-
-map_types = {
-    "ctf": "Capture the Flag",
-    "cp": "Control Point",
-    "tc": "Territorial Control",
-    "pl": "Payload",
-    "arena": "Arena",
-    "plr": "Payload Race",
-    "koth": "King of the Hill",
-    "sd": "Special Delivery",
-    "mvm": "Mann vs. Machine",
-    "rd": "Robot Destruction",
-    "pd": "Player Destruction",
-    "rats": "Rats"
-}
 
 def parse_args():
     global parsed_args
@@ -38,83 +19,19 @@ def parse_args():
 def __main__():
     c = Config(parsed_args.config)
     d = Display(c.get_display())
+    timeout = 15  # seconds, TODO: make this configurable
 
     try:
         while True:
             if not c.summary and not c.details:
-                display_summary(c, d)
+                d.display_summary(c, d, timeout)
             else:
                 if c.summary:
-                    display_summary(c, d)
+                    d.display_summary(c, d, timeout)
                 if c.details:
-                    display_detail(c, d)
+                    d.display_detail(c, d, timeout)
     except (KeyboardInterrupt, SystemExit):
         sys.exit()
-
-def display_summary(c, d):
-    key_chunk = grouper(c.servers.keys(), 3)
-    for chunk in key_chunk:
-        q = []
-        for target in chunk:
-            if target == None:
-                output = " "
-            else:
-                output = ""
-                server = Server(c.get_server(target))
-                info = server.get_info()
-                if info == None:
-                    output += "%s\nUPDATE FAILED\n\n" % target
-                else:
-                    if info.password_protected:
-                        locked = d.lock + " "
-                    else:
-                        locked = ""
-
-                    map_array = info.map_name.split('_')
-                    map_type_raw = map_array.pop(0)
-                    try:
-                        map_type = map_types[map_type_raw]
-                    except (KeyError, IndexError):
-                        map_type = map_type_raw
-
-                    map_name = " ".join(map_array).title()
-
-                    output += target + "\n"
-                    output += map_type + "\n"
-                    output += wrapped(map_name, int(d.max_char // 2)) + "\n"
-                    output += locked + "%s/%s online" % (info.player_count, info.max_players) + "\n\n"
-            q.append(output)
-        d.write_quarters( ul = q[0],
-                          ur = q[1],
-                          ll = q[2],
-                          lr = d.fith_logo )
-        time.sleep(15)
-
-def display_detail(c, d):
-    for target in c.servers.keys():
-        server = Server(c.get_server(target))
-        info = server.get_info()
-        if info == None:
-            body = "%s\nUPDATE FAILED\n\n" % target
-        else:
-            if info.password_protected:
-                locked = d.lock + " "
-            else:
-                locked = ""
-
-            body = "\n" + wrapped(info.server_name, d.max_char) + "\n"
-            body += "\n" + wrapped(info.map_name, d.max_char) + "\n"
-            body += "\n" + locked + "%s/%s online" % (info.player_count, info.max_players) + "\n\n"
-
-        d.write_header_body(target, body)
-        time.sleep(15)
-
-def grouper(iterable, n, fillvalue=None):
-    args = [iter(iterable)] * n
-    return zip_longest(*args, fillvalue=fillvalue)
-
-def wrapped(s, max):
-    return "\n".join(textwrap.wrap(s, width=max))
 
 if __name__ == "__main__":
     parse_args()

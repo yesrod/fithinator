@@ -1,9 +1,31 @@
+from .server import Server
+from .config import Config
+
 from luma.core import cmdline, error
 from luma.core.render import canvas
 from PIL import ImageFont, Image
 
+from itertools import zip_longest
+
 import luma.emulator.device
 import pkg_resources
+import textwrap
+import time
+
+map_types = {
+    "ctf": "Capture the Flag",
+    "cp": "Control Point",
+    "tc": "Territorial Control",
+    "pl": "Payload",
+    "arena": "Arena",
+    "plr": "Payload Race",
+    "koth": "King of the Hill",
+    "sd": "Special Delivery",
+    "mvm": "Mann vs. Machine",
+    "rd": "Robot Destruction",
+    "pd": "Player Destruction",
+    "rats": "Rats"
+}
 
 class Display():
 
@@ -97,3 +119,68 @@ class Display():
 
     def textsize(self, s):
         return self.font.getsize(s)
+
+    def grouper(self, iterable, n, fillvalue=None):
+        args = [iter(iterable)] * n
+        return zip_longest(*args, fillvalue=fillvalue)
+
+    def wrapped(self, s, max):
+        return "\n".join(textwrap.wrap(s, width=max))
+
+    def display_summary(self, c, d, timeout):
+        key_chunk = self.grouper(c.servers.keys(), 3)
+        for chunk in key_chunk:
+            q = []
+            for target in chunk:
+                if target == None:
+                    output = " "
+                else:
+                    output = ""
+                    server = Server(c.get_server(target))
+                    info = server.get_info()
+                    if info == None:
+                        output += "%s\nUPDATE FAILED\n\n" % target
+                    else:
+                        if info.password_protected:
+                            locked = d.lock + " "
+                        else:
+                            locked = ""
+
+                        map_array = info.map_name.split('_')
+                        map_type_raw = map_array.pop(0)
+                        try:
+                            map_type = map_types[map_type_raw]
+                        except (KeyError, IndexError):
+                            map_type = map_type_raw
+
+                        map_name = " ".join(map_array).title()
+
+                        output += target + "\n"
+                        output += map_type + "\n"
+                        output += self.wrapped(map_name, int(d.max_char // 2)) + "\n"
+                        output += locked + "%s/%s online" % (info.player_count, info.max_players) + "\n\n"
+                q.append(output)
+            d.write_quarters( ul = q[0],
+                            ur = q[1],
+                            ll = q[2],
+                            lr = d.fith_logo )
+            time.sleep(timeout)
+
+    def display_detail(self, c, d, timeout):
+        for target in c.servers.keys():
+            server = Server(c.get_server(target))
+            info = server.get_info()
+            if info == None:
+                body = "%s\nUPDATE FAILED\n\n" % target
+            else:
+                if info.password_protected:
+                    locked = d.lock + " "
+                else:
+                    locked = ""
+
+                body = "\n" + self.wrapped(info.server_name, d.max_char) + "\n"
+                body += "\n" + self.wrapped(info.map_name, d.max_char) + "\n"
+                body += "\n" + locked + "%s/%s online" % (info.player_count, info.max_players) + "\n\n"
+
+            d.write_header_body(target, body)
+            time.sleep(timeout)
