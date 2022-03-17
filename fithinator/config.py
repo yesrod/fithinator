@@ -25,14 +25,14 @@ class Config():
 
         try:
             self.summary = config['summary']
-            if not isinstance(self.debug, bool):
+            if not isinstance(self.summary, bool):
                 self.summary = False
         except KeyError:
             self.summary = False
 
         try:
             self.details = config['details']
-            if not isinstance(self.debug, bool):
+            if not isinstance(self.details, bool):
                 self.details = False
         except KeyError:
             self.details = False
