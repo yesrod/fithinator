@@ -1,5 +1,6 @@
 from .server import Server
 from .config import Config
+from .utils import debug_msg
 
 from luma.core import cmdline, error
 from luma.core.render import canvas
@@ -43,6 +44,9 @@ class Display():
         self.fith_logo = self.load_image('%s/font/FITH_Logo.jpg' % static_path)
         self.lock = "\ua5c3"
 
+        self.fps = 0
+        self.frame_time = 0
+
         try:
             parser = cmdline.create_parser(description='FITHINATOR display args')
             conf = cmdline.load_config('%s/conf/%s.conf' % (static_path, display))
@@ -59,6 +63,7 @@ class Display():
 
         self.max_char = int(self.device.width // self.textsize("A")[0])
 
+
     def text_align_center(self, xy, bounds, message, fill="white"):
         bound_w = bounds[0]
         lines = message.split('\n')
@@ -70,14 +75,17 @@ class Display():
                             fill = fill,
                             font=self.font)
 
+
     def write(self, output):
         with canvas(self.device) as self.draw:
             self.draw.text((0, 0), output, font=self.font)
+
 
     def write_quarters(self, ul=None, ur=None, ll=None, lr=None):
         with canvas(self.device) as self.draw:
             for q in ('ul', 'ur', 'll', 'lr'):
                 self.quarter(q, eval(q))
+
 
     def quarter(self, quarter, output):
         half_x = int(self.device.width / 2)
@@ -97,10 +105,12 @@ class Display():
                     output.resize((half_x, half_y)).convert('1')
             )
 
+
     def write_header_body(self, header, body):
         with canvas(self.device) as self.draw:
             self.header(header)
             self.body(body)
+
 
     def header(self, output):
         self.text_align_center(
@@ -108,24 +118,30 @@ class Display():
             (self.device.width, self.device.height), 
             output)
 
+
     def body(self, output):
         self.text_align_center(
             (0,self.font_size_px), 
             (self.device.width, self.device.height),
             output)
 
+
     def load_image(self, image_path):
         return Image.open(image_path)
 
+
     def textsize(self, s):
         return self.font.getsize(s)
+
 
     def grouper(self, iterable, n, fillvalue=None):
         args = [iter(iterable)] * n
         return zip_longest(*args, fillvalue=fillvalue)
 
+
     def wrapped(self, s, max):
         return "\n".join(textwrap.wrap(s, width=max))
+
 
     def display_summary(self, c, d, timeout):
         key_chunk = self.grouper(c.servers.keys(), 3)
@@ -160,11 +176,22 @@ class Display():
                         output += self.wrapped(map_name, int(d.max_char // 2)) + "\n"
                         output += locked + "%s/%s online" % (info.player_count, info.max_players) + "\n\n"
                 q.append(output)
-            d.write_quarters( ul = q[0],
-                            ur = q[1],
-                            ll = q[2],
-                            lr = d.fith_logo )
-            time.sleep(timeout)
+
+            timeout_ns = timeout * 1000000000
+            framecount = 0
+            runtime = 0
+            while runtime < timeout_ns:
+                start_ns = time.perf_counter_ns()
+                d.write_quarters( ul = q[0],
+                                ur = q[1],
+                                ll = q[2],
+                                lr = d.fith_logo )
+                end_ns = time.perf_counter_ns()
+                runtime += (end_ns - start_ns)
+                framecount += 1
+            fps = (framecount / (runtime / 1000000000))
+            debug_msg(c, "fps: %s" % fps)
+
 
     def display_detail(self, c, d, timeout):
         for target in c.servers.keys():
@@ -182,5 +209,14 @@ class Display():
                 body += "\n" + self.wrapped(info.map_name, d.max_char) + "\n"
                 body += "\n" + locked + "%s/%s online" % (info.player_count, info.max_players) + "\n\n"
 
-            d.write_header_body(target, body)
-            time.sleep(timeout)
+            timeout_ns = timeout * 1000000000
+            framecount = 0
+            runtime = 0
+            while runtime < timeout_ns:
+                start_ns = time.perf_counter_ns()
+                d.write_header_body(target, body)
+                end_ns = time.perf_counter_ns()
+                runtime += (end_ns - start_ns)
+                framecount += 1
+            fps = (framecount / (runtime / 1000000000))
+            debug_msg(c, "fps: %s" % fps)
