@@ -1,4 +1,5 @@
-
+import sys
+from datetime import datetime
 
 def debug_msg(c, message):
     if c.debug:
