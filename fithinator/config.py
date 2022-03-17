@@ -25,17 +25,24 @@ class Config():
 
         try:
             self.summary = config['summary']
-            if type(self.summary) != bool:
+            if not isinstance(self.debug, bool):
                 self.summary = False
         except KeyError:
             self.summary = False
 
         try:
             self.details = config['details']
-            if type(self.details) != bool:
+            if not isinstance(self.debug, bool):
                 self.details = False
         except KeyError:
             self.details = False
+
+        try:
+            self.debug = config['debug']
+            if not isinstance(self.debug, bool):
+                self.debug = False
+        except KeyError:
+            self.debug = False
 
     def get_server(self, server):
         return (self.servers[server]['host'],
