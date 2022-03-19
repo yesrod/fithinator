@@ -60,6 +60,7 @@ def __main__():
         )
         update_process.daemon = True
         update_process.start()
+        s = q.get(block=True)
         while True:
             try:
                 s = q.get(block=False)
