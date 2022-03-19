@@ -198,7 +198,7 @@ class Display():
                                 ur = q[1],
                                 ll = q[2],
                                 lr = self.fith_logo,
-                                spinner = true )
+                                spinner = True )
                 end_ns = time.perf_counter_ns()
                 runtime += (end_ns - start_ns)
                 framecount += 1
