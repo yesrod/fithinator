@@ -149,7 +149,7 @@ class Display():
         if not self.spinner_state or self.spinner_state > 3:
             self.spinner_state = 0
         ret = spinner[self.spinner_state]
-        spinner_state += 1
+        self.spinner_state += 1
         return ret
 
 
