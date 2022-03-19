@@ -1,5 +1,3 @@
-from .server import Server
-from .config import Config
 from .utils import debug_msg
 
 from luma.core import cmdline, error
@@ -30,8 +28,10 @@ map_types = {
 
 class Display():
 
-    def __init__(self, display, font_size=16):
+    def __init__(self, config, display, servers, font_size=16):
+        self.config = config
         self.display = display
+        self.servers = servers
 
         resource_package = __name__
         resource_path = ''
@@ -46,6 +46,7 @@ class Display():
 
         self.fps = 0
         self.frame_time = 0
+        self.spinner_state = 0
 
         try:
             parser = cmdline.create_parser(description='FITHINATOR display args')
@@ -81,10 +82,11 @@ class Display():
             self.draw.text((0, 0), output, font=self.font)
 
 
-    def write_quarters(self, ul=None, ur=None, ll=None, lr=None):
+    def write_quarters(self, ul=None, ur=None, ll=None, lr=None, spinner=False):
         with canvas(self.device) as self.draw:
             for q in ('ul', 'ur', 'll', 'lr'):
                 self.quarter(q, eval(q))
+            self.draw.text((0, 0), self.spinner(), font=self.font)
 
 
     def quarter(self, quarter, output):
@@ -143,26 +145,36 @@ class Display():
         return "\n".join(textwrap.wrap(s, width=max))
 
 
-    def display_summary(self, c, d, timeout):
-        key_chunk = self.grouper(c.servers.keys(), 3)
+    def spinner(self):
+        spinner = ('|', '/', '-', '\\')
+        if not self.spinner_state or self.spinner_state > 3:
+            self.spinner_state = 0
+        ret = spinner[self.spinner_state]
+        self.spinner_state += 1
+        return ret
+
+
+    def display_summary(self, timeout, servers=None):
+        if servers:
+            self.servers = servers
+        key_chunk = self.grouper(self.servers, 3)
         for chunk in key_chunk:
             q = []
-            for target in chunk:
-                if target == None:
+            for server in chunk:
+                if server == None:
                     output = " "
                 else:
                     output = ""
-                    server = Server(c.get_server(target))
-                    info = server.get_info()
-                    if info == None:
+                    target = server.name
+                    if server.info == None:
                         output += "%s\nUPDATE FAILED\n\n" % target
                     else:
-                        if info.password_protected:
-                            locked = d.lock + " "
+                        if server.info.password_protected:
+                            locked = self.lock + " "
                         else:
                             locked = ""
 
-                        map_array = info.map_name.split('_')
+                        map_array = server.info.map_name.split('_')
                         map_type_raw = map_array.pop(0)
                         try:
                             map_type = map_types[map_type_raw]
@@ -173,8 +185,8 @@ class Display():
 
                         output += target + "\n"
                         output += map_type + "\n"
-                        output += self.wrapped(map_name, int(d.max_char // 2)) + "\n"
-                        output += locked + "%s/%s online" % (info.player_count, info.max_players) + "\n\n"
+                        output += self.wrapped(map_name, int(self.max_char // 2)) + "\n"
+                        output += locked + "%s/%s online" % (server.info.player_count, server.info.max_players) + "\n\n"
                 q.append(output)
 
             timeout_ns = timeout * 1000000000
@@ -182,41 +194,43 @@ class Display():
             runtime = 0
             while runtime < timeout_ns:
                 start_ns = time.perf_counter_ns()
-                d.write_quarters( ul = q[0],
+                self.write_quarters( ul = q[0],
                                 ur = q[1],
                                 ll = q[2],
-                                lr = d.fith_logo )
+                                lr = self.fith_logo,
+                                spinner = True )
                 end_ns = time.perf_counter_ns()
                 runtime += (end_ns - start_ns)
                 framecount += 1
             fps = (framecount / (runtime / 1000000000))
-            debug_msg(c, "fps: %s" % fps)
+            debug_msg(self.config, "fps: %s" % fps)
 
 
-    def display_detail(self, c, d, timeout):
-        for target in c.servers.keys():
-            server = Server(c.get_server(target))
-            info = server.get_info()
-            if info == None:
+    def display_detail(self, timeout, servers=None):
+        if servers:
+            self.servers = servers
+        for server in self.servers:
+            target = server.name
+            if server.info == None:
                 body = "%s\nUPDATE FAILED\n\n" % target
             else:
-                if info.password_protected:
-                    locked = d.lock + " "
+                if server.info.password_protected:
+                    locked = self.lock + " "
                 else:
                     locked = ""
 
-                body = "\n" + self.wrapped(info.server_name, d.max_char) + "\n"
-                body += "\n" + self.wrapped(info.map_name, d.max_char) + "\n"
-                body += "\n" + locked + "%s/%s online" % (info.player_count, info.max_players) + "\n\n"
+                body = "\n" + self.wrapped(server.info.server_name, self.max_char) + "\n"
+                body += "\n" + self.wrapped(server.info.map_name, self.max_char) + "\n"
+                body += "\n" + locked + "%s/%s online" % (server.info.player_count, server.info.max_players) + "\n\n"
 
             timeout_ns = timeout * 1000000000
             framecount = 0
             runtime = 0
             while runtime < timeout_ns:
                 start_ns = time.perf_counter_ns()
-                d.write_header_body(target, body)
+                self.write_header_body(target, body)
                 end_ns = time.perf_counter_ns()
                 runtime += (end_ns - start_ns)
                 framecount += 1
             fps = (framecount / (runtime / 1000000000))
-            debug_msg(c, "fps: %s" % fps)
+            debug_msg(self.config, "fps: %s" % fps)
