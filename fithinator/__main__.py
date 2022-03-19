@@ -26,11 +26,15 @@ def update_loop(refresh=15):
     updating = True
     global s
     while updating:
-        for server in s.server_list:
-            server.update_info()
-            server.update_players()
-            server.update_rules()
-        time.sleep(refresh)
+        try:
+            for server in s.server_list:
+                server.update_info()
+                server.update_players()
+                server.update_rules()
+            time.sleep(refresh)
+        except KeyboardInterrupt:
+            updating = False
+            break
 
 
 def server_setup(c):
