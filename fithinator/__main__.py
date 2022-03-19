@@ -1,4 +1,5 @@
 from .server import Server
+from .servers import Servers
 from .config import Config
 from .display import Display
 from .utils import debug_msg
