@@ -1,6 +1,7 @@
 from .server import Server
 from .config import Config
 from .display import Display
+from .utils import debug_msg
 
 import argparse
 import sys
@@ -39,6 +40,7 @@ def server_setup(c):
 def __main__():
     c = Config(parsed_args.config)
     s = server_setup(c)
+    debug_msg(c, s)
     d = Display(c, c.get_display(), s)
     timeout = 15  # seconds, TODO: make this configurable
 
