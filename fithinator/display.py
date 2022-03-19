@@ -143,6 +143,15 @@ class Display():
         return "\n".join(textwrap.wrap(s, width=max))
 
 
+    def spinner(self):
+        spinner = ('|', '/', '-', '\\')
+        if not self.spinner_state or self.spinner_state > 3:
+            self.spinner_state = 0
+        ret = spinner[self.spinner_state]
+        spinner_state += 1
+        return ret
+
+
     def display_summary(self, c, d, timeout):
         key_chunk = self.grouper(c.servers.keys(), 3)
         for chunk in key_chunk:
@@ -184,8 +193,8 @@ class Display():
                 start_ns = time.perf_counter_ns()
                 d.write_quarters( ul = q[0],
                                 ur = q[1],
-                                ll = q[2],
-                                lr = d.fith_logo )
+                                ll = self.spinner(),
+                                lr = self.fith_logo )
                 end_ns = time.perf_counter_ns()
                 runtime += (end_ns - start_ns)
                 framecount += 1
