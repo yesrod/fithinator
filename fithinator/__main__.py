@@ -34,7 +34,7 @@ def update_loop(s, refresh=15):
 def server_setup(c):
     s = []
     for server in c.servers.keys():
-        s.append(Server(c.get_server(server)))
+        s.append(server, Server(c.get_server(server)))
     return s
 
 

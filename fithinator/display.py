@@ -164,7 +164,7 @@ class Display():
                     output = " "
                 else:
                     output = ""
-                    target = server.address[0]
+                    target = server.name
                     if server.info == None:
                         output += "%s\nUPDATE FAILED\n\n" % target
                     else:
@@ -206,7 +206,7 @@ class Display():
 
     def display_detail(self, timeout):
         for server in self.servers:
-            target = server.address[0]
+            target = server.name
             if server.info == None:
                 body = "%s\nUPDATE FAILED\n\n" % target
             else:
