@@ -156,7 +156,7 @@ class Display():
     def display_summary(self, timeout, servers=None):
         if servers:
             self.servers = servers
-        key_chunk = self.grouper(self.servers.server_list, 3)
+        key_chunk = self.grouper(self.servers, 3)
         for chunk in key_chunk:
             q = []
             for server in chunk:
@@ -207,7 +207,7 @@ class Display():
     def display_detail(self, timeout, servers=None):
         if servers:
             self.servers = servers
-        for server in self.servers.server_list:
+        for server in self.servers:
             target = server.name
             if server.info == None:
                 body = "%s\nUPDATE FAILED\n\n" % target
