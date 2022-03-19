@@ -46,6 +46,7 @@ class Display():
 
         self.fps = 0
         self.frame_time = 0
+        self.spinner_state = 0
 
         try:
             parser = cmdline.create_parser(description='FITHINATOR display args')
