@@ -82,10 +82,11 @@ class Display():
             self.draw.text((0, 0), output, font=self.font)
 
 
-    def write_quarters(self, ul=None, ur=None, ll=None, lr=None):
+    def write_quarters(self, ul=None, ur=None, ll=None, lr=None, spinner=False):
         with canvas(self.device) as self.draw:
             for q in ('ul', 'ur', 'll', 'lr'):
                 self.quarter(q, eval(q))
+            self.draw.text((0, 0), self.spinner(), font=self.font)
 
 
     def quarter(self, quarter, output):
@@ -196,8 +197,8 @@ class Display():
                 self.write_quarters( ul = q[0],
                                 ur = q[1],
                                 ll = q[2],
-                                lr = self.fith_logo )
-                self.write(self.spinner())
+                                lr = self.fith_logo,
+                                spinner = true )
                 end_ns = time.perf_counter_ns()
                 runtime += (end_ns - start_ns)
                 framecount += 1
