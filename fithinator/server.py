@@ -1,5 +1,4 @@
 import a2s
-import time
 import socket
 
 class Server():
