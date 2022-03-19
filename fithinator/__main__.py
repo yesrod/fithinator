@@ -21,9 +21,10 @@ def parse_args():
     parsed_args = p.parse_args()
 
 
-def update_loop(s, refresh=15):
+def update_loop(refresh=15):
     global updating
     updating = True
+    global s
     while updating:
         for server in s.server_list:
             server.update_info()
@@ -41,6 +42,7 @@ def server_setup(c):
 
 def __main__():
     c = Config(parsed_args.config)
+    global s
     s = Servers(server_setup(c))
     d = Display(c, c.get_display(), s)
     timeout = 15  # seconds, TODO: make this configurable
@@ -49,8 +51,7 @@ def __main__():
         update_process = multiprocessing.Process(
             group=None, 
             target=update_loop, 
-            name='hoplite data collection', 
-            args=(s,)
+            name='hoplite data collection'
         )
         update_process.daemon = True
         update_process.start()
