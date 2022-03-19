@@ -201,7 +201,7 @@ class Display():
                 runtime += (end_ns - start_ns)
                 framecount += 1
             fps = (framecount / (runtime / 1000000000))
-            debug_msg(c, "fps: %s" % fps)
+            debug_msg(self.config, "fps: %s" % fps)
 
 
     def display_detail(self, timeout):
@@ -229,4 +229,4 @@ class Display():
                 runtime += (end_ns - start_ns)
                 framecount += 1
             fps = (framecount / (runtime / 1000000000))
-            debug_msg(c, "fps: %s" % fps)
+            debug_msg(self.config, "fps: %s" % fps)
