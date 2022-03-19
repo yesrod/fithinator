@@ -30,8 +30,10 @@ map_types = {
 
 class Display():
 
-    def __init__(self, display, font_size=16):
+    def __init__(self, config, display, servers, font_size=16):
+        self.config = config
         self.display = display
+        self.servers = servers
 
         resource_package = __name__
         resource_path = ''
@@ -153,26 +155,25 @@ class Display():
         return ret
 
 
-    def display_summary(self, c, d, timeout):
-        key_chunk = self.grouper(c.servers.keys(), 3)
+    def display_summary(self, timeout):
+        key_chunk = self.grouper(self.servers, 3)
         for chunk in key_chunk:
             q = []
-            for target in chunk:
-                if target == None:
+            for server in chunk:
+                if server == None:
                     output = " "
                 else:
                     output = ""
-                    server = Server(c.get_server(target))
-                    info = server.get_info()
-                    if info == None:
+                    target = server.address[0]
+                    if server.info == None:
                         output += "%s\nUPDATE FAILED\n\n" % target
                     else:
-                        if info.password_protected:
-                            locked = d.lock + " "
+                        if server.info.password_protected:
+                            locked = self.lock + " "
                         else:
                             locked = ""
 
-                        map_array = info.map_name.split('_')
+                        map_array = server.info.map_name.split('_')
                         map_type_raw = map_array.pop(0)
                         try:
                             map_type = map_types[map_type_raw]
@@ -183,8 +184,8 @@ class Display():
 
                         output += target + "\n"
                         output += map_type + "\n"
-                        output += self.wrapped(map_name, int(d.max_char // 2)) + "\n"
-                        output += locked + "%s/%s online" % (info.player_count, info.max_players) + "\n\n"
+                        output += self.wrapped(map_name, int(self.max_char // 2)) + "\n"
+                        output += locked + "%s/%s online" % (server.info.player_count, server.info.max_players) + "\n\n"
                 q.append(output)
 
             timeout_ns = timeout * 1000000000
@@ -192,7 +193,7 @@ class Display():
             runtime = 0
             while runtime < timeout_ns:
                 start_ns = time.perf_counter_ns()
-                d.write_quarters( ul = q[0],
+                self.write_quarters( ul = q[0],
                                 ur = q[1],
                                 ll = self.spinner(),
                                 lr = self.fith_logo )
@@ -203,28 +204,27 @@ class Display():
             debug_msg(c, "fps: %s" % fps)
 
 
-    def display_detail(self, c, d, timeout):
-        for target in c.servers.keys():
-            server = Server(c.get_server(target))
-            info = server.get_info()
-            if info == None:
+    def display_detail(self, timeout):
+        for server in self.servers:
+            target = server.address[0]
+            if server.info == None:
                 body = "%s\nUPDATE FAILED\n\n" % target
             else:
-                if info.password_protected:
-                    locked = d.lock + " "
+                if server.info.password_protected:
+                    locked = self.lock + " "
                 else:
                     locked = ""
 
-                body = "\n" + self.wrapped(info.server_name, d.max_char) + "\n"
-                body += "\n" + self.wrapped(info.map_name, d.max_char) + "\n"
-                body += "\n" + locked + "%s/%s online" % (info.player_count, info.max_players) + "\n\n"
+                body = "\n" + self.wrapped(server.info.server_name, self.max_char) + "\n"
+                body += "\n" + self.wrapped(server.info.map_name, self.max_char) + "\n"
+                body += "\n" + locked + "%s/%s online" % (server.info.player_count, server.info.max_players) + "\n\n"
 
             timeout_ns = timeout * 1000000000
             framecount = 0
             runtime = 0
             while runtime < timeout_ns:
                 start_ns = time.perf_counter_ns()
-                d.write_header_body(target, body)
+                self.write_header_body(target, body)
                 end_ns = time.perf_counter_ns()
                 runtime += (end_ns - start_ns)
                 framecount += 1

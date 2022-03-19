@@ -1,33 +1,36 @@
 import a2s
+import time
 import socket
 
 class Server():
 
     def __init__(self, addr):
-        global address
-        address = addr
+        self.address = addr
+        self.info = None
+        self.players = None
+        self.rules = None
 
-    def get_address(self):
-        return address
 
     def set_address(self, addr):
-        global address
-        address = addr
+        self.address = addr
 
-    def get_info(self):
+
+    def update_info(self):
         try:
-            return a2s.info(address)
+            self.info = a2s.info(self.address)
         except (socket.timeout, OSError, a2s.exceptions.BrokenMessageError):
             return None
 
-    def get_players(self):
+
+    def update_players(self):
         try:
-            return a2s.players(address)
+            self.players = a2s.players(self.address)
         except (socket.timeout, OSError, a2s.exceptions.BrokenMessageError):
             return None
 
-    def get_rules(self):
+
+    def update_rules(self):
         try:
-            return a2s.rules(address)
+            self.rules = a2s.rules(self.address)
         except (socket.timeout, OSError, a2s.exceptions.BrokenMessageError):
             return None
