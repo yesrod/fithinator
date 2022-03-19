@@ -195,8 +195,9 @@ class Display():
                 start_ns = time.perf_counter_ns()
                 self.write_quarters( ul = q[0],
                                 ur = q[1],
-                                ll = self.spinner(),
+                                ll = q[2],
                                 lr = self.fith_logo )
+                self.write(self.spinner())
                 end_ns = time.perf_counter_ns()
                 runtime += (end_ns - start_ns)
                 framecount += 1
