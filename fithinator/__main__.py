@@ -24,9 +24,9 @@ def update_loop(s, refresh=15):
     updating = True
     while updating:
         for server in s:
-            s.update_info()
-            s.update_players()
-            s.update_rules()
+            server.update_info()
+            server.update_players()
+            server.update_rules()
         time.sleep(refresh)
 
 
@@ -40,7 +40,6 @@ def server_setup(c):
 def __main__():
     c = Config(parsed_args.config)
     s = server_setup(c)
-    debug_msg(c, s)
     d = Display(c, c.get_display(), s)
     timeout = 15  # seconds, TODO: make this configurable
 
@@ -49,7 +48,7 @@ def __main__():
             group=None, 
             target=update_loop, 
             name='hoplite data collection', 
-            args=(s)
+            args=(s,)
         )
         update_process.daemon = True
         update_process.start()
