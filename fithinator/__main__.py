@@ -53,12 +53,12 @@ def __main__():
         update_process.start()
         while True:
             if not c.summary and not c.details:
-                d.display_summary(c, d, timeout)
+                d.display_summary(timeout)
             else:
                 if c.summary:
-                    d.display_summary(c, d, timeout)
+                    d.display_summary(timeout)
                 if c.details:
-                    d.display_detail(c, d, timeout)
+                    d.display_detail(timeout)
     except (KeyboardInterrupt, SystemExit):
         global updating
         updating = False
