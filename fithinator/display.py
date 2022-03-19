@@ -153,7 +153,9 @@ class Display():
         return ret
 
 
-    def display_summary(self, timeout):
+    def display_summary(self, timeout, servers=None):
+        if servers:
+            self.servers = servers
         key_chunk = self.grouper(self.servers.server_list, 3)
         for chunk in key_chunk:
             q = []
@@ -202,7 +204,9 @@ class Display():
             debug_msg(self.config, "fps: %s" % fps)
 
 
-    def display_detail(self, timeout):
+    def display_detail(self, timeout, servers=None):
+        if servers:
+            self.servers = servers
         for server in self.servers.server_list:
             target = server.name
             if server.info == None:
