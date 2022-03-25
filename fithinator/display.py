@@ -137,9 +137,10 @@ class Display():
     def render_image(self, image):
         if image.is_animated:
             try:
-                return image.seek(image.tell() + 1)
+                image.seek(image.tell() + 1)
             except EOFError:
-                return image.seek(0)
+                image.seek(0)
+        return image
 
 
     def textsize(self, s):
