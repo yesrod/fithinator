@@ -43,6 +43,8 @@ class Display():
 
         self.fith_logo = self.load_image('%s/font/FITH_Logo.jpg' % static_path)
         self.fith_rotate = self.load_image('%s/font/fith_rotate.gif' % static_path)
+        self.fith_rotate_last_frame = 0
+        self.fith_rotate_refresh = 100  # ms, default frame duration
         self.lock = "\ua5c3"
 
         self.fps = 0
@@ -132,15 +134,19 @@ class Display():
 
 
     def load_image(self, image_path):
-        return Image.open(image_path)
+        ret = Image.open(image_path)
+        if ret.info.get("duration", None):
+            self.fith_rotate_refresh = ret.info.get("duration")
+            debug_msg(self.config, "%s duration: %s" % (image_path, self.fith_rotate_refresh))
 
 
     def render_image(self, image):
         if image.is_animated:
-            try:
-                image.seek(image.tell() + 1)
-            except EOFError:
-                image.seek(0)
+            if (time.perf_counter_ns() / 1000) - self.fith_rotate_last_frame >= self.fith_rotate_refresh:
+                try:
+                    image.seek(image.tell() + 1)
+                except EOFError:
+                    image.seek(0)
         return image
 
 
