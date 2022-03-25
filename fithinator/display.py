@@ -87,7 +87,8 @@ class Display():
         with canvas(self.device) as self.draw:
             for q in ('ul', 'ur', 'll', 'lr'):
                 self.quarter(q, eval(q))
-            self.draw.text((0, 0), self.spinner(), font=self.font)
+            if spinner:
+                self.draw.text((0, 0), self.spinner(), font=self.font)
 
 
     def quarter(self, quarter, output):
