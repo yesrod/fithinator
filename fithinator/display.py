@@ -42,6 +42,7 @@ class Display():
         self.font = ImageFont.truetype('%s/font/FreeSans.ttf' % static_path, self.font_size)
 
         self.fith_logo = self.load_image('%s/font/FITH_Logo.jpg' % static_path)
+        self.fith_rotate = self.load_image('%s/font/fith_rotate.gif' % static_path)
         self.lock = "\ua5c3"
 
         self.fps = 0
@@ -132,6 +133,14 @@ class Display():
         return Image.open(image_path)
 
 
+    def render_image(self, image):
+        if image.is_animated:
+            try:
+                return image.seek(image.tell() + 1)
+            except EOFError:
+                return image.seek(0)
+
+
     def textsize(self, s):
         return self.font.getsize(s)
 
@@ -194,11 +203,13 @@ class Display():
             runtime = 0
             while runtime < timeout_ns:
                 start_ns = time.perf_counter_ns()
-                self.write_quarters( ul = q[0],
-                                ur = q[1],
-                                ll = q[2],
-                                lr = self.fith_logo,
-                                spinner = True )
+                self.write_quarters( 
+                    ul = q[0],
+                    ur = q[1],
+                    ll = q[2],
+                    lr = self.render_image(self.fith_rotate),
+                    spinner = True 
+                )
                 end_ns = time.perf_counter_ns()
                 runtime += (end_ns - start_ns)
                 framecount += 1
