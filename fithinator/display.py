@@ -138,6 +138,7 @@ class Display():
         if ret.info.get("duration", None):
             self.fith_rotate_refresh = ret.info.get("duration")
             debug_msg(self.config, "%s duration: %s" % (image_path, self.fith_rotate_refresh))
+        return ret
 
 
     def render_image(self, image):
