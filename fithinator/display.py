@@ -47,6 +47,7 @@ class Display():
 
         self.fps = 0
         self.frame_time = 0
+        self.spinner = ('|', '/', '-', '\\')
         self.spinner_state = 0
 
         try:
@@ -157,10 +158,9 @@ class Display():
 
 
     def spinner(self):
-        spinner = ('|', '/', '-', '\\')
         if not self.spinner_state or self.spinner_state > 3:
             self.spinner_state = 0
-        ret = spinner[self.spinner_state]
+        ret = self.spinner[self.spinner_state]
         self.spinner_state += 1
         return ret
 
@@ -210,7 +210,7 @@ class Display():
                     ur = q[1],
                     ll = q[2],
                     lr = self.render_image(self.fith_rotate),
-                    spinner = True 
+                    spinner = False 
                 )
                 end_ns = time.perf_counter_ns()
                 runtime += (end_ns - start_ns)
