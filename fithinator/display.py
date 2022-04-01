@@ -143,12 +143,12 @@ class Display():
 
     def render_image(self, image):
         if image.is_animated:
-            if (time.perf_counter_ns() / 1000) - self.fith_rotate_last_frame >= self.fith_rotate_refresh:
+            if (time.perf_counter_ns() / 1000000) - self.fith_rotate_last_frame >= self.fith_rotate_refresh:
                 try:
                     image.seek(image.tell() + 1)
                 except EOFError:
                     image.seek(0)
-                self.fith_rotate_last_frame = (time.perf_counter_ns() / 1000)
+                self.fith_rotate_last_frame = (time.perf_counter_ns() / 1000000)
         return image
 
 
