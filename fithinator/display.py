@@ -41,10 +41,10 @@ class Display():
         self.font_size_px = int(font_size * 1.33333333)
         self.font = ImageFont.truetype('%s/font/FreeSans.ttf' % static_path, self.font_size)
 
-        self.fith_logo = self.load_image('%s/font/FITH_Logo.jpg' % static_path)
-        self.fith_rotate = self.load_image('%s/font/fith_rotate.gif' % static_path)
         self.fith_rotate_last_frame = 0
         self.fith_rotate_refresh = 100  # ms, default frame duration
+        self.fith_logo = self.load_image('%s/font/FITH_Logo.jpg' % static_path)
+        self.fith_rotate = self.load_image('%s/font/fith_rotate.gif' % static_path)
         self.lock = "\ua5c3"
 
         self.fps = 0
