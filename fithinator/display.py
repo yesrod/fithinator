@@ -41,7 +41,7 @@ class Display():
         self.font_size_px = int(font_size * 1.33333333)
         self.font = ImageFont.truetype('%s/font/FreeSans.ttf' % static_path, self.font_size)
 
-        self.fith_rotate_last_frame = 0
+        self.fith_rotate_frametime = 0
         self.fith_rotate_refresh = 100  # ms, default frame duration
         self.fith_logo = self.load_image('%s/font/FITH_Logo.jpg' % static_path)
         self.fith_rotate = self.load_image('%s/font/fith_rotate.gif' % static_path)
@@ -143,12 +143,13 @@ class Display():
 
     def render_image(self, image):
         if image.is_animated:
-            if (time.perf_counter_ns() / 1000000) - self.fith_rotate_last_frame >= self.fith_rotate_refresh:
-                try:
-                    image.seek(image.tell() + 1)
-                except EOFError:
-                    image.seek(0)
-                self.fith_rotate_last_frame = (time.perf_counter_ns() / 1000000)
+            if self.fith_rotate_frametime >= self.fith_rotate_refresh:
+                for i in range(1, int(self.fith_rotate_frametime / self.fith_rotate_refresh)):
+                    try:
+                        image.seek(image.tell() + 1)
+                    except EOFError:
+                        image.seek(0)
+                self.fith_rotate_frametime = self.fith_rotate_frametime % self.fith_rotate_refresh
         return image
 
 
