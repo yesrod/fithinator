@@ -41,6 +41,7 @@ class Display():
         self.font_size_px = int(font_size * 1.33333333)
         self.font = ImageFont.truetype('%s/font/FreeSans.ttf' % static_path, self.font_size)
 
+        self.fith_rotate_lastframe = (time.perf_counter_ns() / 1000000)
         self.fith_rotate_frametime = 0
         self.fith_rotate_refresh = 100  # ms, default frame duration
         self.fith_logo = self.load_image('%s/font/FITH_Logo.jpg' % static_path)
@@ -48,7 +49,7 @@ class Display():
         self.lock = "\ua5c3"
 
         self.fps = 0
-        self.frame_time = 0
+        self.frame_time = (time.perf_counter_ns() / 1000000)
         self.spinner = ('|', '/', '-', '\\')
         self.spinner_state = 0
 
@@ -143,13 +144,15 @@ class Display():
 
     def render_image(self, image):
         if image.is_animated:
+            self.fith_rotate_frametime += ((time.perf_counter_ns() / 1000000) - self.fith_rotate_lastframe)
             if self.fith_rotate_frametime >= self.fith_rotate_refresh:
-                for i in range(1, int(self.fith_rotate_frametime / self.fith_rotate_refresh)):
+                for i in range(0, int(self.fith_rotate_frametime / self.fith_rotate_refresh)):
                     try:
                         image.seek(image.tell() + 1)
                     except EOFError:
                         image.seek(0)
-                self.fith_rotate_frametime = self.fith_rotate_frametime % self.fith_rotate_refresh
+                    self.fith_rotate_frametime -= self.fith_rotate_refresh
+                self.fith_rotate_lastframe = (time.perf_counter_ns() / 1000000)
         return image
 
 
@@ -224,6 +227,7 @@ class Display():
                 end_ns = time.perf_counter_ns()
                 runtime += (end_ns - start_ns)
                 framecount += 1
+                self.frame_time = time.perf_counter_ns() / 1000000
             fps = (framecount / (runtime / 1000000000))
             debug_msg(self.config, "fps: %s" % fps)
 
@@ -254,5 +258,6 @@ class Display():
                 end_ns = time.perf_counter_ns()
                 runtime += (end_ns - start_ns)
                 framecount += 1
+                self.frame_time = time.perf_counter_ns() / 1000000
             fps = (framecount / (runtime / 1000000000))
             debug_msg(self.config, "fps: %s" % fps)
