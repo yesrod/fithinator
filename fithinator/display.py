@@ -148,6 +148,7 @@ class Display():
                     image.seek(image.tell() + 1)
                 except EOFError:
                     image.seek(0)
+                self.fith_rotate_last_frame = time.perf_counter_ns()
         return image
 
 
