@@ -23,7 +23,8 @@ map_types = {
     "mvm": "Mann vs. Machine",
     "rd": "Robot Destruction",
     "pd": "Player Destruction",
-    "rats": "Rats"
+    "rats": "Rats",
+    "tfdb": "Dodgeball"
 }
 
 class Display():
