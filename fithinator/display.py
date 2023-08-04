@@ -53,8 +53,8 @@ class Display():
         self.spinner = ('|', '/', '-', '\\')
         self.spinner_state = 0
 
+        parser = cmdline.create_parser(description='FITHINATOR display args')
         try:
-            parser = cmdline.create_parser(description='FITHINATOR display args')
             conf = cmdline.load_config('%s/conf/%s.conf' % (static_path, display))
             args = parser.parse_args(conf)
         except FileNotFoundError:
