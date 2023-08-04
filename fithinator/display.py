@@ -209,7 +209,7 @@ class Display():
                         output += target + "\n"
                         output += map_type + "\n"
                         output += self.wrapped(map_name, int(self.max_char // 2)) + "\n"
-                        output += locked + "%s/%s online" % (server.get_player_count(), server.info.max_players) + "\n\n"
+                        output += locked + "%s/%s online" % (server.info.player_count - server.info.bot_count, server.info.max_players) + "\n\n"
                 q.append(output)
 
             timeout_ns = timeout * 1000000000
@@ -247,7 +247,7 @@ class Display():
 
                 body = "\n" + self.wrapped(server.info.server_name, self.max_char) + "\n"
                 body += "\n" + self.wrapped(server.info.map_name, self.max_char) + "\n"
-                body += "\n" + locked + "%s/%s online" % (server.get_player_count(), server.info.max_players) + "\n\n"
+                body += "\n" + locked + "%s/%s online" % (server.info.player_count - server.info.bot_count, server.info.max_players) + "\n\n"
 
             timeout_ns = timeout * 1000000000
             framecount = 0
