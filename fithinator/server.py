@@ -37,3 +37,9 @@ class Server():
         except (socket.timeout, OSError, a2s.exceptions.BrokenMessageError):
             print("%s: error updating rules" % self.name)
             self.rules = None
+
+    def get_player_count(self):
+        if self.info is not None and 'player_count' in self.info and 'bot_count' in self.info:
+            return int(self.info.player_count) - int(self.info.bot_count)
+        else:
+            return 0

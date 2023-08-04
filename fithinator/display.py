@@ -6,7 +6,6 @@ from PIL import ImageFont, Image
 
 from itertools import zip_longest
 
-import luma.emulator.device
 import pkg_resources
 import textwrap
 import time
@@ -23,7 +22,8 @@ map_types = {
     "mvm": "Mann vs. Machine",
     "rd": "Robot Destruction",
     "pd": "Player Destruction",
-    "rats": "Rats"
+    "rats": "Rats",
+    "tfdb": "Dodgeball"
 }
 
 class Display():
@@ -41,15 +41,20 @@ class Display():
         self.font_size_px = int(font_size * 1.33333333)
         self.font = ImageFont.truetype('%s/font/FreeSans.ttf' % static_path, self.font_size)
 
+        self.fith_rotate_lastframe = (time.perf_counter_ns() / 1000000)
+        self.fith_rotate_frametime = 0.0
+        self.fith_rotate_refresh = 100.0  # ms, default frame duration
         self.fith_logo = self.load_image('%s/font/FITH_Logo.jpg' % static_path)
+        self.fith_rotate = self.load_image('%s/font/fith_rotate.gif' % static_path)
         self.lock = "\ua5c3"
 
         self.fps = 0
-        self.frame_time = 0
+        self.frame_time = (time.perf_counter_ns() / 1000000)
+        self.spinner = ('|', '/', '-', '\\')
         self.spinner_state = 0
 
+        parser = cmdline.create_parser(description='FITHINATOR display args')
         try:
-            parser = cmdline.create_parser(description='FITHINATOR display args')
             conf = cmdline.load_config('%s/conf/%s.conf' % (static_path, display))
             args = parser.parse_args(conf)
         except FileNotFoundError:
@@ -86,7 +91,8 @@ class Display():
         with canvas(self.device) as self.draw:
             for q in ('ul', 'ur', 'll', 'lr'):
                 self.quarter(q, eval(q))
-            self.draw.text((0, 0), self.spinner(), font=self.font)
+            if spinner:
+                self.draw.text((0, 0), self.spinner(), font=self.font)
 
 
     def quarter(self, quarter, output):
@@ -129,7 +135,25 @@ class Display():
 
 
     def load_image(self, image_path):
-        return Image.open(image_path)
+        ret = Image.open(image_path)
+        if ret.info.get("duration", None):
+            self.fith_rotate_refresh = ret.info.get("duration")
+            debug_msg(self.config, "%s duration: %s" % (image_path, self.fith_rotate_refresh))
+        return ret
+
+
+    def render_image(self, image):
+        if image.is_animated:
+            now = (time.perf_counter_ns() / 1000000)
+            self.fith_rotate_frametime += (now - self.fith_rotate_lastframe)
+            while self.fith_rotate_frametime >= self.fith_rotate_refresh:
+                try:
+                    image.seek(image.tell() + 1)
+                except EOFError:
+                    image.seek(0)
+                self.fith_rotate_frametime -= self.fith_rotate_refresh
+            self.fith_rotate_lastframe = now
+        return image
 
 
     def textsize(self, s):
@@ -146,10 +170,9 @@ class Display():
 
 
     def spinner(self):
-        spinner = ('|', '/', '-', '\\')
         if not self.spinner_state or self.spinner_state > 3:
             self.spinner_state = 0
-        ret = spinner[self.spinner_state]
+        ret = self.spinner[self.spinner_state]
         self.spinner_state += 1
         return ret
 
@@ -186,7 +209,7 @@ class Display():
                         output += target + "\n"
                         output += map_type + "\n"
                         output += self.wrapped(map_name, int(self.max_char // 2)) + "\n"
-                        output += locked + "%s/%s online" % (server.info.player_count, server.info.max_players) + "\n\n"
+                        output += locked + "%s/%s online" % (server.get_player_count(), server.info.max_players) + "\n\n"
                 q.append(output)
 
             timeout_ns = timeout * 1000000000
@@ -194,14 +217,17 @@ class Display():
             runtime = 0
             while runtime < timeout_ns:
                 start_ns = time.perf_counter_ns()
-                self.write_quarters( ul = q[0],
-                                ur = q[1],
-                                ll = q[2],
-                                lr = self.fith_logo,
-                                spinner = True )
+                self.write_quarters( 
+                    ul = q[0],
+                    ur = q[1],
+                    ll = q[2],
+                    lr = self.render_image(self.fith_rotate),
+                    spinner = False
+                )
                 end_ns = time.perf_counter_ns()
                 runtime += (end_ns - start_ns)
                 framecount += 1
+                self.frame_time = time.perf_counter_ns() / 1000000
             fps = (framecount / (runtime / 1000000000))
             debug_msg(self.config, "fps: %s" % fps)
 
@@ -221,7 +247,7 @@ class Display():
 
                 body = "\n" + self.wrapped(server.info.server_name, self.max_char) + "\n"
                 body += "\n" + self.wrapped(server.info.map_name, self.max_char) + "\n"
-                body += "\n" + locked + "%s/%s online" % (server.info.player_count, server.info.max_players) + "\n\n"
+                body += "\n" + locked + "%s/%s online" % (server.get_player_count(), server.info.max_players) + "\n\n"
 
             timeout_ns = timeout * 1000000000
             framecount = 0
@@ -232,5 +258,6 @@ class Display():
                 end_ns = time.perf_counter_ns()
                 runtime += (end_ns - start_ns)
                 framecount += 1
+                self.frame_time = time.perf_counter_ns() / 1000000
             fps = (framecount / (runtime / 1000000000))
             debug_msg(self.config, "fps: %s" % fps)
