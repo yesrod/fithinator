@@ -42,8 +42,8 @@ class Display():
         self.font = ImageFont.truetype('%s/font/FreeSans.ttf' % static_path, self.font_size)
 
         self.fith_rotate_lastframe = (time.perf_counter_ns() / 1000000)
-        self.fith_rotate_frametime = 0
-        self.fith_rotate_refresh = 100  # ms, default frame duration
+        self.fith_rotate_frametime = 0.0
+        self.fith_rotate_refresh = 100.0  # ms, default frame duration
         self.fith_logo = self.load_image('%s/font/FITH_Logo.jpg' % static_path)
         self.fith_rotate = self.load_image('%s/font/fith_rotate.gif' % static_path)
         self.lock = "\ua5c3"
@@ -222,7 +222,7 @@ class Display():
                     ur = q[1],
                     ll = q[2],
                     lr = self.render_image(self.fith_rotate),
-                    spinner = False 
+                    spinner = False
                 )
                 end_ns = time.perf_counter_ns()
                 runtime += (end_ns - start_ns)
