@@ -15,5 +15,5 @@ setup(
     python_requires='>=3.6',
     install_requires=['python-a2s>=v1.3.0', 'pyyaml', 'luma.core', 'luma.emulator'],
     package_dir={'fithinator': 'fithinator/'},
-    package_data={'fithinator': ['conf/*.conf', 'font/*']}
+    package_data={'fithinator': ['display_conf/*.conf', 'static/*']}
 )
