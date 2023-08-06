@@ -6,7 +6,7 @@ from PIL import ImageFont, Image
 
 from itertools import zip_longest
 
-import pkg_resources
+import importlib.resources
 import textwrap
 import time
 
@@ -34,29 +34,31 @@ class Display():
         self.display = display
         self.servers = servers
 
-        resource_package = __name__
-        resource_path = ''
-        static_path = pkg_resources.resource_filename(resource_package, resource_path)
+        display_conf_dir = importlib.resources.files('fithinator.static')
+        static_dir = importlib.resources.files('fithinator.static')
+        font_path = str(static_dir.joinpath('FreeSans.ttf'))
+        static_logo_path = str(static_dir.joinpath('FITH_Logo.jpg'))
+        anim_logo_path = str(static_dir.joinpath('fith_rotate.gif'))
 
         self.font_size = font_size
         self.font_size_px = int(font_size * 1.33333333)
-        self.font = ImageFont.truetype('%s/font/FreeSans.ttf' % static_path, self.font_size)
+        self.font = ImageFont.truetype(font_path, self.font_size)
 
-        self.fith_rotate_lastframe = (time.perf_counter_ns() / 1000000)
-        self.fith_rotate_frametime = 0.0
-        self.fith_rotate_refresh = 100.0  # ms, default frame duration
-        self.fith_logo = self.load_image('%s/font/FITH_Logo.jpg' % static_path)
-        self.fith_rotate = self.load_image('%s/font/fith_rotate.gif' % static_path)
+        self.anim_lastframe = (time.perf_counter_ns() / 1000000)
+        self.anim_frametime = 0.0
+        self.anim_refresh = 100.0  # ms, default frame duration
+        self.fith_logo = self.load_image(static_logo_path)
+        self.fith_anim = self.load_image(anim_logo_path)
         self.lock = "\ua5c3"
 
         self.fps = 0
         self.frame_time = (time.perf_counter_ns() / 1000000)
-        self.spinner = ('|', '/', '-', '\\')
+        self.spinner_char = ('|', '/', '-', '\\')
         self.spinner_state = 0
 
         parser = cmdline.create_parser(description='FITHINATOR display args')
         try:
-            conf = cmdline.load_config('%s/conf/%s.conf' % (static_path, display))
+            conf = cmdline.load_config(str(display_conf_dir.joinpath(f"{display}.conf")))
             args = parser.parse_args(conf)
         except FileNotFoundError:
             conf = ['--display=%s' % display]
@@ -66,7 +68,7 @@ class Display():
             self.device = cmdline.create_device(args)
         except error.Error as e:
             parser.error(e)
-            self.device = None
+            raise
 
         self.max_char = int(self.device.width // self.textsize("A")[0])
 
@@ -137,23 +139,22 @@ class Display():
 
     def load_image(self, image_path):
         ret = Image.open(image_path)
-        if ret.info.get("duration", None):
-            self.fith_rotate_refresh = ret.info.get("duration")
-            debug_msg(self.config, "%s duration: %s" % (image_path, self.fith_rotate_refresh))
+        self.anim_refresh = ret.info.get("duration", 100.0)
+        debug_msg(self.config, "%s duration: %s" % (image_path, self.anim_refresh))
         return ret
 
 
     def render_image(self, image):
         if image.is_animated:
             now = (time.perf_counter_ns() / 1000000)
-            self.fith_rotate_frametime += (now - self.fith_rotate_lastframe)
-            while self.fith_rotate_frametime >= self.fith_rotate_refresh:
+            self.anim_frametime += (now - self.anim_lastframe)
+            while self.anim_frametime >= self.anim_refresh:
                 try:
                     image.seek(image.tell() + 1)
                 except EOFError:
                     image.seek(0)
-                self.fith_rotate_frametime -= self.fith_rotate_refresh
-            self.fith_rotate_lastframe = now
+                self.anim_frametime -= self.anim_refresh
+            self.anim_lastframe = now
         return image
 
 
@@ -173,7 +174,7 @@ class Display():
     def spinner(self):
         if not self.spinner_state or self.spinner_state > 3:
             self.spinner_state = 0
-        ret = self.spinner[self.spinner_state]
+        ret = self.spinner_char[self.spinner_state]
         self.spinner_state += 1
         return ret
 
@@ -222,7 +223,7 @@ class Display():
                     ul = q[0],
                     ur = q[1],
                     ll = q[2],
-                    lr = self.render_image(self.fith_rotate),
+                    lr = self.render_image(self.fith_anim),
                     spinner = False
                 )
                 end_ns = time.perf_counter_ns()
