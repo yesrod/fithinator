@@ -31,23 +31,23 @@ def server_setup(c):
     return s
 
 
-def main_loop():
+def main_loop(parsed_args):
     c = Config(parsed_args.config)
     s = server_setup(c)
     d = Display(c, c.get_display(), s)
     q = multiprocessing.Queue()
     timeout = 15  # seconds, TODO: make this configurable
 
+    update_process = multiprocessing.Process(
+        group=None, 
+        target=update_loop, 
+        name='hoplite data collection',
+        args=(s, q)
+    )
+    update_process.daemon = True
+    update_process.start()
+    s = q.get(block=True)
     try:
-        update_process = multiprocessing.Process(
-            group=None, 
-            target=update_loop, 
-            name='hoplite data collection',
-            args=(s, q)
-        )
-        update_process.daemon = True
-        update_process.start()
-        s = q.get(block=True)
         while True:
             try:
                 s = q.get(block=False)

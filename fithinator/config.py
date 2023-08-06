@@ -15,7 +15,7 @@ class Config():
             self.servers = config['servers']
         except KeyError:
             print('ERROR: No servers found in %s' % config_file)
-            self.servers = None
+            raise
         try:
             self.display = config['display']
         except KeyError:
