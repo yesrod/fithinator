@@ -23,7 +23,8 @@ map_types = {
     "rd": "Robot Destruction",
     "pd": "Player Destruction",
     "rats": "Rats",
-    "tfdb": "Dodgeball"
+    "tfdb": "Dodgeball",
+    "vsh": "Vs. Saxton Hale"
 }
 
 class Display():
