@@ -35,11 +35,11 @@ class Display():
         self.servers = servers
 
         with importlib.resources.path('fithinator.static', 'FreeSans.ttf') as p:
-            font_path = p
+            font_path = str(p)
         with importlib.resources.path('fithinator.static', 'FITH_Logo.jpg') as p:
-            static_logo_path = p
+            static_logo_path = str(p)
         with importlib.resources.path('fithinator.static', 'fith_rotate.gif') as p:
-            anim_logo_path = p
+            anim_logo_path = str(p)
 
         self.font_size = font_size
         self.font_size_px = int(font_size * 1.33333333)
@@ -60,7 +60,7 @@ class Display():
         parser = cmdline.create_parser(description='FITHINATOR display args')
         try:
             with importlib.resources.path('fithinator.display_conf', f"{display}.conf") as p:
-                conf = cmdline.load_config(p)
+                conf = cmdline.load_config(str(p))
             args = parser.parse_args(conf)
         except FileNotFoundError:
             conf = ['--display=%s' % display]
