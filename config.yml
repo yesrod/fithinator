@@ -3,12 +3,12 @@ servers:
   'Main Server':
     host: '216.52.148.223'
     port: 27015
-  '24/7 Payload':
-    host: '216.52.148.223'
-    port: 27069
-  'Heavy Boxing':
+  'Dodgeball/Fun':
     host: '216.52.148.223'
     port: 27060
+  'JUMBO':
+    host: '216.52.148.223'
+    port: 27069
 
 display: 'ili9341'
 summary: true

@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 import sys
 
-if not sys.version_info[0] == 3:
+if sys.version_info[0] != 3:
     sys.exit("ERROR: The FITHINATOR requires at least Python 3.7")
 else:
     if sys.version_info[1] < 7:
@@ -9,7 +9,7 @@ else:
 
 setup(
     name='fithinator',
-    version='0.0.1',
+    version='0.1.0',
     description='The FITHINATOR: A status monitor for FITH TF2 servers',
     packages=find_packages(),
     python_requires='>=3.7',

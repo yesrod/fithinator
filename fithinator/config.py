@@ -14,12 +14,12 @@ class Config():
         try:
             self.servers = config['servers']
         except KeyError:
-            print('ERROR: No servers found in %s' % config_file)
+            print(f'ERROR: No servers found in {config_file}')
             raise
         try:
             self.display = config['display']
         except KeyError:
-            print('Display not found in %s' % config_file)
+            print(f'Display not found in {config_file}')
             print('Defaulting to ILI9341')
             self.display = 'ili9341'
 

@@ -1,12 +1,14 @@
-from .utils import debug_msg
+from fithinator.renderable.image import ImageFile
+from fithinator.renderable.spinner import Spinner
 
-from luma.core import cmdline, error
+from luma.core import cmdline
 from luma.core.render import canvas
-from PIL import ImageFont, Image
+from PIL import ImageFont
 
 from itertools import zip_longest
 
 import importlib.resources
+import logging
 import textwrap
 import time
 
@@ -26,6 +28,8 @@ map_types = {
     "tfdb": "Dodgeball",
     "vsh": "Vs. Saxton Hale"
 }
+
+LOGGER = logging.Logger(__name__)
 
 class Display():
 
@@ -48,14 +52,13 @@ class Display():
         self.anim_lastframe = (time.perf_counter_ns() / 1000000)
         self.anim_frametime = 0.0
         self.anim_refresh = 100.0  # ms, default frame duration
-        self.fith_logo = self.load_image(static_logo_path)
-        self.fith_anim = self.load_image(anim_logo_path)
+        self.fith_logo = ImageFile(static_logo_path)
+        self.fith_anim = ImageFile(anim_logo_path)
+        self.spinner = Spinner()
         self.lock = "\ua5c3"
 
         self.fps = 0
         self.frame_time = (time.perf_counter_ns() / 1000000)
-        self.spinner_char = ('|', '/', '-', '\\')
-        self.spinner_state = 0
 
         parser = cmdline.create_parser(description='FITHINATOR display args')
         try:
@@ -63,16 +66,12 @@ class Display():
                 conf = cmdline.load_config(str(p))
             args = parser.parse_args(conf)
         except FileNotFoundError:
-            conf = ['--display=%s' % display]
+            conf = [f'--display={display}']
             args = parser.parse_args(conf)
 
-        try:
-            self.device = cmdline.create_device(args)
-        except error.Error as e:
-            parser.error(e)
-            raise
-
+        self.device = cmdline.create_device(args)
         self.max_char = int(self.device.width // self.textsize("A")[0])
+
 
 
     def text_align_center(self, xy, bounds, message, fill="white"):
@@ -97,7 +96,7 @@ class Display():
             for q in ('ul', 'ur', 'll', 'lr'):
                 self.quarter(q, eval(q))
             if spinner:
-                self.draw.text((0, 0), self.spinner(), font=self.font)
+                self.draw.text((0, 0), self.spinner.render(), font=self.font)
 
 
     def quarter(self, quarter, output):
@@ -109,7 +108,7 @@ class Display():
                     'll': (0, half_y),
                     'lr': (half_x, half_y)}
         if quarter not in quarters.keys():
-            raise ValueError("quarter must be one of %s" % ", ".join(quarters))
+            raise ValueError(f"quarter must be one of {', '.join(quarters)}")
 
         if type(output) == str:
             self.text_align_center(quarters[quarter], bounds, output)
@@ -139,27 +138,6 @@ class Display():
             output)
 
 
-    def load_image(self, image_path):
-        ret = Image.open(image_path)
-        self.anim_refresh = ret.info.get("duration", 100.0)
-        debug_msg(self.config, "%s duration: %s" % (image_path, self.anim_refresh))
-        return ret
-
-
-    def render_image(self, image):
-        if image.is_animated:
-            now = (time.perf_counter_ns() / 1000000)
-            self.anim_frametime += (now - self.anim_lastframe)
-            while self.anim_frametime >= self.anim_refresh:
-                try:
-                    image.seek(image.tell() + 1)
-                except EOFError:
-                    image.seek(0)
-                self.anim_frametime -= self.anim_refresh
-            self.anim_lastframe = now
-        return image
-
-
     def textsize(self, s):
         return self.font.getsize(s)
 
@@ -171,14 +149,6 @@ class Display():
 
     def wrapped(self, s, max):
         return "\n".join(textwrap.wrap(s, width=max))
-
-
-    def spinner(self):
-        if not self.spinner_state or self.spinner_state > 3:
-            self.spinner_state = 0
-        ret = self.spinner_char[self.spinner_state]
-        self.spinner_state += 1
-        return ret
 
 
     def display_summary(self, timeout, servers=None):
@@ -194,7 +164,7 @@ class Display():
                     output = ""
                     target = server.name
                     if server.info == None:
-                        output += "%s\nUPDATE FAILED\n\n" % target
+                        output += f"{target}\nUPDATE FAILED\n\n"
                     else:
                         if server.info.password_protected:
                             locked = self.lock + " "
@@ -210,10 +180,10 @@ class Display():
 
                         map_name = " ".join(map_array).title()
 
-                        output += target + "\n"
-                        output += map_type + "\n"
-                        output += self.wrapped(map_name, int(self.max_char // 2)) + "\n"
-                        output += locked + "%s/%s online" % (server.info.player_count - server.info.bot_count, server.info.max_players) + "\n\n"
+                        output += f"{target}\n"
+                        output += f"{map_type}\n"
+                        output += f"{self.wrapped(map_name, int(self.max_char // 2))}\n"
+                        output += f"{locked}{server.info.player_count - server.info.bot_count}/{server.info.max_players} online\n\n"
                 q.append(output)
 
             timeout_ns = timeout * 1000000000
@@ -225,7 +195,7 @@ class Display():
                     ul = q[0],
                     ur = q[1],
                     ll = q[2],
-                    lr = self.render_image(self.fith_anim),
+                    lr = self.fith_anim.render(),
                     spinner = False
                 )
                 end_ns = time.perf_counter_ns()
@@ -233,7 +203,7 @@ class Display():
                 framecount += 1
                 self.frame_time = time.perf_counter_ns() / 1000000
             fps = (framecount / (runtime / 1000000000))
-            debug_msg(self.config, "fps: %s" % fps)
+            LOGGER.debug(f"fps: {fps}")
 
 
     def display_detail(self, timeout, servers=None):
@@ -242,16 +212,16 @@ class Display():
         for server in self.servers:
             target = server.name
             if server.info == None:
-                body = "%s\nUPDATE FAILED\n\n" % target
+                body = f"{target}\nUPDATE FAILED\n\n"
             else:
                 if server.info.password_protected:
                     locked = self.lock + " "
                 else:
                     locked = ""
 
-                body = "\n" + self.wrapped(server.info.server_name, self.max_char) + "\n"
-                body += "\n" + self.wrapped(server.info.map_name, self.max_char) + "\n"
-                body += "\n" + locked + "%s/%s online" % (server.info.player_count - server.info.bot_count, server.info.max_players) + "\n\n"
+                body  = f"\n{self.wrapped(server.info.server_name, self.max_char)}\n"
+                body += f"\n{self.wrapped(server.info.map_name, self.max_char)}\n"
+                body += f"\n{locked}{server.info.player_count - server.info.bot_count}/{server.info.max_players} online\n\n"
 
             timeout_ns = timeout * 1000000000
             framecount = 0
@@ -264,4 +234,4 @@ class Display():
                 framecount += 1
                 self.frame_time = time.perf_counter_ns() / 1000000
             fps = (framecount / (runtime / 1000000000))
-            debug_msg(self.config, "fps: %s" % fps)
+            LOGGER.debug(f"fps: {fps}")
