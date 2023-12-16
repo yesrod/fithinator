@@ -1,4 +1,3 @@
-from yaml import parse
 from fithinator.fithinator import main_loop
 
 import argparse

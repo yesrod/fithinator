@@ -1,6 +1,6 @@
-from .server import Server
-from .config import Config
-from .display import Display
+from fithinator.server import Server
+from fithinator.config import Config
+from fithinator.display import Display
 
 import sys
 import time
