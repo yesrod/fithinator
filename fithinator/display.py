@@ -66,6 +66,7 @@ class Display():
                 conf = cmdline.load_config(str(p))
             args = parser.parse_args(conf)
         except FileNotFoundError:
+            LOGGER.warning(f"{display}.conf not found, trying manual configuration")
             conf = [f'--display={display}']
             args = parser.parse_args(conf)
 
@@ -78,7 +79,10 @@ class Display():
         bound_w = bounds[0]
         lines = message.split('\n')
         for i, line in enumerate(lines):
-            w = self.draw.textsize(line, font=self.font)[0]
+            if hasattr(self.draw, 'textsize'):
+                w = self.draw.textsize(line, font=self.font)[0]
+            else:
+                w = self.draw.textlength(line, font=self.font)
             self.draw.text((xy[0] + ((bound_w - w) / 2), 
                             xy[1] + (self.font_size_px * i)),
                             line, 
@@ -139,7 +143,12 @@ class Display():
 
 
     def textsize(self, s):
-        return self.font.getsize(s)
+        #return self.font.getsize(s)
+        if hasattr(self.font, 'getbbox'):
+            left, top, right, bottom = self.font.getbbox(s)
+            return (right - left, bottom - top)
+        else:
+            return self.font.getsize(s)
 
 
     def grouper(self, iterable, n, fillvalue=None):
