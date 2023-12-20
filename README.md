@@ -11,16 +11,30 @@ Default config location is `/boot/fithinator.yml` to allow editing the config vi
 
 INSTALL
 =======
+Ensure that `dtparam=spi=on` is uncommented in `/boot/config.txt`, then reboot.
+
 ```
-apt-get update
-apt-get install python3-pygame
-sudo pip3 install git+https://github.com/yesrod/fithinator.git
+sudo apt-get update
+sudo apt-get install python3-pygame python3-wheel
+sudo python3 -m pip install git+https://github.com/yesrod/fithinator.git
+```
+
+Newer versions of Python will complain about externally managed environments.  To install on Bookworm and up, use a venv.
+```
+sudo apt-get update
+sudo apt-get install python3-pygame python3-wheel
+python3 -m venv ~/.fithinator/
+sudo ~/.fithinator/bin/python3 -m pip install git+https://github.com/yesrod/fithinator.git
 ```
 
 RUN
 ===
 ```
-sudo python3 -m fithinator -c config.yml
+# native
+sudo python3 -m fithinator -c /boot/config.yml
+
+# in venv
+sudo ~/.fithinator/bin/python3 -m fithinator -c /boot/config.yml
 ```
 
 Systemd script is provided under `systemd` for convenience.

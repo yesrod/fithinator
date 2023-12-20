@@ -1,0 +1,2 @@
+recursive-include display_conf/ *.conf 
+recursive-include static/ *

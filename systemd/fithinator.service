@@ -2,7 +2,10 @@
 Description=The FITHINATOR
 
 [Service]
-ExecStart=/usr/bin/python3 -m fithinator -c /boot/fithinator.yml
+# native
+#ExecStart=/usr/bin/python3 -m fithinator -c /boot/fithinator.yml
+# venv
+ExecStart=/home/pi/.fithinator/bin/python3 -m fithinator -c /boot/fithinator.yml
 KillSignal=SIGINT
 
 [Install]
