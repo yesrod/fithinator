@@ -90,7 +90,7 @@ class Display():
             self.draw.text((0, 0), output, font=self.font)
 
 
-    def write_quarters(self, spinner=False):
+    def write_quarters(self, ul = None, ur = None, ll = None, lr = None, spinner=False):
         with canvas(self.device) as self.draw:
             for q in ('ul', 'ur', 'll', 'lr'):
                 self.quarter(q, eval(q))
