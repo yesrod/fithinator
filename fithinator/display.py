@@ -40,19 +40,15 @@ class Display():
 
         with importlib.resources.path('fithinator.static', 'FreeSans.ttf') as p:
             font_path = str(p)
-        with importlib.resources.path('fithinator.static', 'FITH_Logo.jpg') as p:
-            static_logo_path = str(p)
+        #with importlib.resources.path('fithinator.static', 'FITH_Logo.jpg') as p:
+        #    static_logo_path = str(p)
         with importlib.resources.path('fithinator.static', 'fith_rotate.gif') as p:
             anim_logo_path = str(p)
 
         self.font_size = font_size
         self.font_size_px = int(font_size * 1.33333333)
         self.font = ImageFont.truetype(font_path, self.font_size)
-
-        self.anim_lastframe = (time.perf_counter_ns() / 1000000)
-        self.anim_frametime = 0.0
-        self.anim_refresh = 100.0  # ms, default frame duration
-        self.fith_logo = ImageFile(static_logo_path)
+        #self.fith_logo = ImageFile(static_logo_path)
         self.fith_anim = ImageFile(anim_logo_path)
         self.spinner = Spinner()
         self.lock = "\ua5c3"
@@ -72,7 +68,6 @@ class Display():
 
         self.device = cmdline.create_device(args)
         self.max_char = int(self.device.width // self.textsize("A")[0])
-
 
 
     def text_align_center(self, xy, bounds, message, fill="white"):
@@ -95,7 +90,7 @@ class Display():
             self.draw.text((0, 0), output, font=self.font)
 
 
-    def write_quarters(self, ul=None, ur=None, ll=None, lr=None, spinner=False):
+    def write_quarters(self, spinner=False):
         with canvas(self.device) as self.draw:
             for q in ('ul', 'ur', 'll', 'lr'):
                 self.quarter(q, eval(q))
@@ -171,9 +166,8 @@ class Display():
                     output = " "
                 else:
                     output = ""
-                    target = server.name
                     if server.info == None:
-                        output += f"{target}\nUPDATE FAILED\n\n"
+                        output += f"{server.name}\nUPDATE FAILED\n\n"
                     else:
                         if server.info.password_protected:
                             locked = self.lock + " "
@@ -189,7 +183,7 @@ class Display():
 
                         map_name = " ".join(map_array).title()
 
-                        output += f"{target}\n"
+                        output += f"{server.name}\n"
                         output += f"{map_type}\n"
                         output += f"{self.wrapped(map_name, int(self.max_char // 2))}\n"
                         output += f"{locked}{server.info.player_count - server.info.bot_count}/{server.info.max_players} online\n\n"
@@ -219,9 +213,8 @@ class Display():
         if servers:
             self.servers = servers
         for server in self.servers:
-            target = server.name
             if server.info == None:
-                body = f"{target}\nUPDATE FAILED\n\n"
+                body = f"{server.name}\nUPDATE FAILED\n\n"
             else:
                 if server.info.password_protected:
                     locked = self.lock + " "
@@ -237,7 +230,7 @@ class Display():
             runtime = 0
             while runtime < timeout_ns:
                 start_ns = time.perf_counter_ns()
-                self.write_header_body(target, body)
+                self.write_header_body(server.name, body)
                 end_ns = time.perf_counter_ns()
                 runtime += (end_ns - start_ns)
                 framecount += 1
