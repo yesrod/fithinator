@@ -1,5 +1,6 @@
 [Unit]
 Description=The FITHINATOR
+After=network-online.target
 
 [Service]
 # native
