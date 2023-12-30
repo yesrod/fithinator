@@ -1,0 +1,1 @@
+from .fithinator import Fithinator

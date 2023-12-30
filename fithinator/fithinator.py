@@ -8,60 +8,63 @@ import multiprocessing
 from queue import Empty
 
 
-def update_loop(s, q, refresh=15):
-    global updating
-    updating = True
-    while updating:
-        try:
-            for server in s:
-                server.update_info()
-                server.update_players()
-                server.update_rules()
-            q.put(s)
-            time.sleep(refresh)
-        except KeyboardInterrupt:
-            updating = False
-            break
+class Fithinator:
+    def __init__(self, parsed_args):
+        self.updating = False
+        self.config = Config(parsed_args.config)
+        self.servers = self.server_setup()
+        self.display = Display(self.config, self.config.get_display(), self.servers)
+        self.q = multiprocessing.Queue()
 
 
-def server_setup(c):
-    s = []
-    for server in c.servers.keys():
-        s.append(Server(server, c.get_server(server)))
-    return s
-
-
-def main_loop(parsed_args):
-    c = Config(parsed_args.config)
-    s = server_setup(c)
-    d = Display(c, c.get_display(), s)
-    q = multiprocessing.Queue()
-    timeout = 15  # seconds, TODO: make this configurable
-
-    update_process = multiprocessing.Process(
-        group=None, 
-        target=update_loop, 
-        name='hoplite data collection',
-        args=(s, q)
-    )
-    update_process.daemon = True
-    update_process.start()
-    s = q.get(block=True)
-    try:
-        while True:
+    def update_loop(self, s, q, refresh=15):
+        self.updating = True
+        while self.updating:
             try:
-                s = q.get(block=False)
-            except Empty:
-                pass
-            if not c.summary and not c.details:
-                d.display_summary(timeout, servers=s)
-            else:
-                if c.summary:
-                    d.display_summary(timeout, servers=s)
-                if c.details:
-                    d.display_detail(timeout, servers=s)
-    except (KeyboardInterrupt, SystemExit):
-        global updating
-        updating = False
-        update_process.join(30)
-        sys.exit()
+                for server in s:
+                    server.update_info()
+                    server.update_players()
+                    server.update_rules()
+                q.put(s)
+                time.sleep(refresh)
+            except KeyboardInterrupt:
+                self.updating = False
+                break
+
+
+    def server_setup(self):
+        s = []
+        for server in self.config.servers.keys():
+            s.append(Server(server, self.config.get_server(server)))
+        return s
+
+
+    def main_loop(self):
+        timeout = 15  # seconds, TODO: make this configurable
+
+        update_process = multiprocessing.Process(
+            group=None, 
+            target=self.update_loop, 
+            name='hoplite data collection',
+            args=(self.servers, self.q)
+        )
+        update_process.daemon = True
+        update_process.start()
+        self.servers = self.q.get(block=True)
+        try:
+            while True:
+                try:
+                    self.servers = self.q.get(block=False)
+                except Empty:
+                    pass
+                if not self.config.summary and not self.config.details:
+                    self.display.display_summary(timeout, servers=self.servers)
+                else:
+                    if self.config.summary:
+                        self.display.display_summary(timeout, servers=self.servers)
+                    if self.config.details:
+                        self.display.display_detail(timeout, servers=self.servers)
+        except (KeyboardInterrupt, SystemExit):
+            self.updating = False
+            update_process.join(30)
+            sys.exit()

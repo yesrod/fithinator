@@ -1,4 +1,4 @@
-from fithinator.fithinator import main_loop
+from fithinator import Fithinator
 
 import argparse
 
@@ -14,4 +14,5 @@ def parse_args():
     return parsed_args
 
 if __name__ == "__main__":
-    main_loop(parse_args())
+    f = Fithinator(parse_args())
+    f.main_loop()
