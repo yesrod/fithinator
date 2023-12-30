@@ -68,17 +68,23 @@ class Display():
 
         self.device = cmdline.create_device(args)
         self.max_char = int(self.device.width // self.textsize("A")[0])
+        self.half_x = int(self.device.width / 2)
+        self.half_y = int(self.device.height / 2)
+        self.bounds = (self.half_x, self.half_y)
+        self.quarters = {'ul': (0, 0), 
+                    'ur': (self.half_x, 0), 
+                    'll': (0, self.half_y),
+                    'lr': (self.half_x, self.half_y)}
 
 
     def text_align_center(self, xy, bounds, message, fill="white"):
-        bound_w = bounds[0]
         lines = message.split('\n')
         for i, line in enumerate(lines):
             if hasattr(self.draw, 'textsize'):
                 w = self.draw.textsize(line, font=self.font)[0]
             else:
                 w = self.draw.textlength(line, font=self.font)
-            self.draw.text((xy[0] + ((bound_w - w) / 2), 
+            self.draw.text((xy[0] + ((bounds[0] - w) / 2), 
                             xy[1] + (self.font_size_px * i)),
                             line, 
                             fill = fill,
@@ -99,21 +105,14 @@ class Display():
 
 
     def quarter(self, quarter, output):
-        half_x = int(self.device.width / 2)
-        half_y = int(self.device.height / 2)
-        bounds = (half_x, half_y)
-        quarters = {'ul': (0, 0), 
-                    'ur': (half_x, 0), 
-                    'll': (0, half_y),
-                    'lr': (half_x, half_y)}
-        if quarter not in quarters.keys():
-            raise ValueError(f"quarter must be one of {', '.join(quarters)}")
+        if quarter not in self.quarters.keys():
+            raise ValueError(f"quarter must be one of {', '.join(self.quarters)}")
 
         if type(output) == str:
-            self.text_align_center(quarters[quarter], bounds, output)
+            self.text_align_center(self.quarters[quarter], self.bounds, output)
         elif callable(getattr(output, 'tobitmap', None)):
-            self.draw.bitmap(quarters[quarter], 
-                    output.resize((half_x, half_y)).convert('1')
+            self.draw.bitmap(self.quarters[quarter], 
+                    output.resize((self.half_x, self.half_y)).convert('1')
             )
 
 

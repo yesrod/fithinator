@@ -27,7 +27,7 @@ class ImageFile(Renderable):
         return ret
 
     def render(self):
-        if self._image.is_animated:
+        if hasattr(self._image, 'is_animated') and self._image.is_animated:
             now = (time.perf_counter_ns() / 1000000)
             self._anim_frametime += (now - self._anim_lastframe)
             while self._anim_frametime >= self._anim_refresh:
