@@ -140,7 +140,7 @@ class Display():
     def textsize(self, s):
         l, t, r, b = self.font.getbbox(s)
         LOGGER.debug(f"w: {r} - {l} h: {b} - {t}")
-        return (r-l, b-t)
+        return (r, b)
 
 
     def grouper(self, iterable, n, fillvalue=None):
