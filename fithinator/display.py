@@ -46,7 +46,7 @@ class Display():
             anim_logo_path = str(p)
 
         self.font_size = font_size
-        self.font_size_px = int(font_size * 1.33333333)
+        self.font_height_px = int(font_size * 1.33333333)
         self.font = ImageFont.truetype(font_path, self.font_size)
         #self.fith_logo = ImageFile(static_logo_path)
         self.fith_anim = ImageFile(anim_logo_path)
@@ -81,12 +81,9 @@ class Display():
     def text_align_center(self, xy, bounds, message, fill="white"):
         lines = message.split('\n')
         for i, line in enumerate(lines):
-            if hasattr(self.draw, 'textsize'):
-                w = self.draw.textsize(line, font=self.font)[0]
-            else:
-                w = self.draw.textlength(line, font=self.font)
+            _,  _, w, h = self.draw.textbbox((0, 0), line, font=self.font)
             self.draw.text((xy[0] + ((bounds[0] - w) / 2), 
-                            xy[1] + (self.font_size_px * i)),
+                            xy[1] + (h * i)),
                             line, 
                             fill = fill,
                             font=self.font)
@@ -135,18 +132,14 @@ class Display():
 
     def body(self, output):
         self.text_align_center(
-            (0,self.font_size_px), 
+            (0,self.font_height_px), 
             (self.device.width, self.device.height),
             output)
 
 
     def textsize(self, s):
-        #return self.font.getsize(s)
-        if hasattr(self.font, 'getbbox'):
-            left, top, right, bottom = self.font.getbbox(s)
-            return (right - left, bottom - top)
-        else:
-            return self.font.getsize(s)
+        _,  _, w, h = self.draw.textbbox((0, 0), s, font=self.font)
+        return (w, h)
 
 
     def grouper(self, iterable, n, fillvalue=None):
