@@ -48,7 +48,7 @@ class Display():
         self.font_size = font_size
         #self.font_height_px = int(font_size * 1.33333333)
         self.font = ImageFont.truetype(font_path, self.font_size)
-        self.padding_px = 2
+        self.padding_px = 1
         #self.fith_logo = ImageFile(static_logo_path)
         self.fith_anim = ImageFile(anim_logo_path)
         self.spinner = Spinner()
