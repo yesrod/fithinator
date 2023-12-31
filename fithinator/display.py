@@ -105,7 +105,7 @@ class Display():
                 self.draw.text((0, 0), self.spinner.render(), font=self.font)
             if self.show_fps:
                 w, h = self.textsize(self.fps)
-                self.draw.text((self.device.width - w, self.device.height - h), int(self.fps), font=self.font)
+                self.draw.text((self.device.width - w, self.device.height - h), str(int(self.fps)), font=self.font)
 
 
     def quarter(self, quarter, output):
