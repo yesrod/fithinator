@@ -44,6 +44,20 @@ class Config():
         except KeyError:
             self.debug = False
 
+        try:
+            self.font_size = int(config['font_size'])
+            if not self.font_size:
+                self.font_size = 16
+        except (KeyError, ValueError):
+            self.font_size = 16
+
+        try:
+            self.show_fps = config['show_fps']
+            if not isinstance(self.show_fps, bool):
+                self.show_fps = False
+        except KeyError:
+            self.show_fps = False
+
     def get_server(self, server):
         return (self.servers[server]['host'],
                 self.servers[server]['port']

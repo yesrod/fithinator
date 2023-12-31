@@ -33,7 +33,7 @@ LOGGER = logging.Logger(__name__)
 
 class Display():
 
-    def __init__(self, config, display, servers, font_size=16):
+    def __init__(self, config, display, servers, font_size=16, show_fps=False):
         self.config = config
         self.display = display
         self.servers = servers
@@ -53,6 +53,7 @@ class Display():
         self.spinner = Spinner()
         self.lock = "\ua5c3"
 
+        self.show_fps = show_fps
         self.fps = 0
         self.frame_time = (time.perf_counter_ns() / 1000000)
 
@@ -96,12 +97,15 @@ class Display():
             self.draw.text((0, 0), output, font=self.font)
 
 
-    def write_quarters(self, ul = None, ur = None, ll = None, lr = None, spinner=False):
+    def write_quarters(self, ul = None, ur = None, ll = None, lr = None, spinner=False, show_fps=False):
         with canvas(self.device) as self.draw:
             for q in ('ul', 'ur', 'll', 'lr'):
                 self.quarter(q, eval(q))
             if spinner:
                 self.draw.text((0, 0), self.spinner.render(), font=self.font)
+            if self.show_fps:
+                w = self.draw.textlength(str(self.fps), font=self.font)
+                self.draw.text((self.device.width - w, 0), str(self.fps), font=self.font)
 
 
     def quarter(self, quarter, output):

@@ -13,3 +13,6 @@ servers:
 display: 'ili9341'
 summary: true
 details: false
+show_fps: false
+font_size: 16
+debug: false

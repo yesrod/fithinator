@@ -2,10 +2,13 @@ from fithinator.server import Server
 from fithinator.config import Config
 from fithinator.display import Display
 
+import logging
 import sys
 import time
 import multiprocessing
 from queue import Empty
+
+LOGGER = logging.Logger(__name__)
 
 
 class Fithinator:
@@ -13,8 +16,16 @@ class Fithinator:
         self.updating = False
         self.config = Config(parsed_args.config)
         self.servers = self.server_setup()
-        self.display = Display(self.config, self.config.get_display(), self.servers)
+        self.display = Display(
+            self.config, 
+            self.config.get_display(), 
+            self.servers, 
+            font_size=self.config.font_size, 
+            show_fps=self.config.show_fps
+        )
         self.q = multiprocessing.Queue()
+        if self.config.debug:
+            LOGGER.setLevel(logging.DEBUG)
 
 
     def update_loop(self, s, q, refresh=15):
