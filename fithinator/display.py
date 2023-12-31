@@ -46,7 +46,7 @@ class Display():
             anim_logo_path = str(p)
 
         self.font_size = font_size
-        self.font_height_px = int(font_size * 1.33333333)
+        #self.font_height_px = int(font_size * 1.33333333)
         self.font = ImageFont.truetype(font_path, self.font_size)
         #self.fith_logo = ImageFile(static_logo_path)
         self.fith_anim = ImageFile(anim_logo_path)
@@ -68,6 +68,8 @@ class Display():
             args = parser.parse_args(conf)
 
         self.device = cmdline.create_device(args)
+        with canvas(self.device) as self.draw:
+            pass
         self.max_char = int(self.device.width // self.textsize("A")[0])
         self.half_x = int(self.device.width / 2)
         self.half_y = int(self.device.height / 2)
@@ -132,7 +134,7 @@ class Display():
 
     def body(self, output):
         self.text_align_center(
-            (0,self.font_height_px), 
+            (0, self.textsize('A')[1]), 
             (self.device.width, self.device.height),
             output)
 
