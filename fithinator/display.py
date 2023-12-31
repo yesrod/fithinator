@@ -141,8 +141,7 @@ class Display():
 
 
     def textsize(self, s):
-        l, t, r, b = self.font.getbbox(s)
-        LOGGER.debug(f"w: {r} - {l} h: {b} - {t}")
+        l, t, r, b = self.font.getbbox(str(s))
         return (r + (self.padding_px * 2), b + (self.padding_px * 2))
 
 
