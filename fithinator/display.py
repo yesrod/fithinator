@@ -68,8 +68,6 @@ class Display():
             args = parser.parse_args(conf)
 
         self.device = cmdline.create_device(args)
-        with canvas(self.device) as self.draw:
-            pass
         self.max_char = int(self.device.width // self.textsize("A")[0])
         self.half_x = int(self.device.width / 2)
         self.half_y = int(self.device.height / 2)
@@ -83,7 +81,7 @@ class Display():
     def text_align_center(self, xy, bounds, message, fill="white"):
         lines = message.split('\n')
         for i, line in enumerate(lines):
-            _,  _, w, h = self.draw.textbbox((0, 0), line, font=self.font)
+            w, h = self.textsize(line)
             self.draw.text((xy[0] + ((bounds[0] - w) / 2), 
                             xy[1] + (h * i)),
                             line, 
@@ -140,8 +138,8 @@ class Display():
 
 
     def textsize(self, s):
-        _,  _, w, h = self.draw.textbbox((0, 0), s, font=self.font)
-        return (w, h)
+        l, t, r, b = self.font.getbbox(s)
+        return (r-l, b-t)
 
 
     def grouper(self, iterable, n, fillvalue=None):
