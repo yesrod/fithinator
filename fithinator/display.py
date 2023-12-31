@@ -48,6 +48,7 @@ class Display():
         self.font_size = font_size
         #self.font_height_px = int(font_size * 1.33333333)
         self.font = ImageFont.truetype(font_path, self.font_size)
+        self.padding_px = 2
         #self.fith_logo = ImageFile(static_logo_path)
         self.fith_anim = ImageFile(anim_logo_path)
         self.spinner = Spinner()
@@ -80,10 +81,12 @@ class Display():
 
     def text_align_center(self, xy, bounds, message, fill="white"):
         lines = message.split('\n')
+        total_h = 0
         for i, line in enumerate(lines):
             w, h = self.textsize(line)
+            total_h += h
             self.draw.text((xy[0] + ((bounds[0] - w) / 2), 
-                            xy[1] + (h * i)),
+                            xy[1] + total_h),
                             line, 
                             fill = fill,
                             font=self.font)
@@ -101,8 +104,8 @@ class Display():
             if spinner:
                 self.draw.text((0, 0), self.spinner.render(), font=self.font)
             if self.show_fps:
-                w = self.draw.textlength(str(self.fps), font=self.font)
-                self.draw.text((self.device.width - w, 0), str(int(self.fps)), font=self.font)
+                w, h = self.textsize(self.fps)
+                self.draw.text((self.device.width - w, self.device.height - h), int(self.fps), font=self.font)
 
 
     def quarter(self, quarter, output):
@@ -140,7 +143,7 @@ class Display():
     def textsize(self, s):
         l, t, r, b = self.font.getbbox(s)
         LOGGER.debug(f"w: {r} - {l} h: {b} - {t}")
-        return (r, b)
+        return (r + (self.padding_px * 2), b + (self.padding_px * 2))
 
 
     def grouper(self, iterable, n, fillvalue=None):
