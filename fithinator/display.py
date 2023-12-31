@@ -208,8 +208,8 @@ class Display():
                 runtime += (end_ns - start_ns)
                 framecount += 1
                 self.frame_time = time.perf_counter_ns() / 1000000
-            fps = (framecount / (runtime / 1000000000))
-            LOGGER.debug(f"fps: {fps}")
+            self.fps = (framecount / (runtime / 1000000000))
+            LOGGER.debug(f"fps: {self.fps}")
 
 
     def display_detail(self, timeout, servers=None):
@@ -238,5 +238,5 @@ class Display():
                 runtime += (end_ns - start_ns)
                 framecount += 1
                 self.frame_time = time.perf_counter_ns() / 1000000
-            fps = (framecount / (runtime / 1000000000))
-            LOGGER.debug(f"fps: {fps}")
+            self.fps = (framecount / (runtime / 1000000000))
+            LOGGER.debug(f"fps: {self.fps}")
