@@ -27,6 +27,11 @@ python3 -m venv ~/.fithinator/
 sudo ~/.fithinator/bin/python3 -m pip install git+https://github.com/yesrod/fithinator.git
 ```
 
+It is recommended to disable powersaving on Bookworm and up, as NetworkManager turns it on by default, and it will cause the Pi to disconnect randomly.
+```
+sudo nmcli c modify <connection name> 802-11-wireless.powersave 2
+```
+
 RUN
 ===
 ```
