@@ -1,13 +1,13 @@
 ---
 servers:
   'Main Server':
-    host: '216.52.148.223'
+    host: 'server.fith.co'
     port: 27015
   'Dodgeball/Fun':
-    host: '216.52.148.223'
+    host: 'server.fith.co'
     port: 27060
   'JUMBO':
-    host: '216.52.148.223'
+    host: 'server.fith.co'
     port: 27069
 
 display: 'ili9341'
